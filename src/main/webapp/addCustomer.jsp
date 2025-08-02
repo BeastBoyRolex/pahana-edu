@@ -1,403 +1,178 @@
+<%--
+  Created by IntelliJ IDEA.
+  User: LENOVO
+  Date: 7/26/2025
+  Time: 2:16 PM
+  To change this template use File | Settings | File Templates.
+--%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <title>Add New Customer - Pahana Edu Bookshop</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        :root {
-            --primary-color: #4361ee;
-            --secondary-color: #3f37c9;
-            --accent-color: #4895ef;
-            --danger-color: #f72585;
-            --success-color: #4cc9f0;
-            --text-color: #2b2d42;
-            --light-color: #f8f9fa;
-            --border-radius: 12px;
-            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
-
-        * {
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
-            color: var(--text-color);
-            line-height: 1.6;
-            min-height: 100vh;
+            background-color: #f4f4f4;
+            color: #333;
         }
 
         .container {
-            max-width: 900px;
-            margin: 40px auto;
-            background: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
+            width: 80%;
+            margin: auto;
             overflow: hidden;
-            animation: fadeInUp 0.6s ease-out;
         }
 
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        header {
+            background: #35424a;
+            color: #ffffff;
+            padding: 20px 0;
+            border-bottom: #e8491d 3px solid;
         }
 
-        .header {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            padding: 25px 30px;
-            position: relative;
-        }
-
-        .header::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 8px;
-            background: linear-gradient(90deg, var(--accent-color), var(--success-color));
-        }
-
-        .header-content {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .header-title h1 {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        .header-title p {
-            opacity: 0.9;
-            font-size: 14px;
-        }
-
-        .back-button {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 50px;
-            cursor: pointer;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: var(--transition);
-            backdrop-filter: blur(5px);
-        }
-
-        .back-button:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateX(-3px);
-        }
-
-        .nav-tabs {
-            background: white;
-            padding: 0 30px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        }
-
-        .nav-tabs ul {
-            display: flex;
-            list-style: none;
-            padding: 0;
+        header h1, header h2 {
             margin: 0;
+            padding: 0 0 0 20px;
         }
 
-        .nav-tabs li {
-            position: relative;
+        nav {
+            background: #e8491d;
+            color: #ffffff;
         }
 
-        .nav-tabs a {
-            color: var(--text-color);
+        nav ul {
+            padding: 0;
+            list-style: none;
+        }
+
+        nav ul li {
+            display: inline;
+            padding: 0 20px 0 20px;
+        }
+
+        nav a {
+            color: #ffffff;
             text-decoration: none;
-            padding: 15px 20px;
-            display: block;
-            font-weight: 500;
-            transition: var(--transition);
+            text-transform: uppercase;
+            font-size: 16px;
         }
 
-        .nav-tabs a:hover {
-            color: var(--primary-color);
-        }
-
-        .nav-tabs li.active a {
-            color: var(--primary-color);
-        }
-
-        .nav-tabs li.active::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 20px;
-            right: 20px;
-            height: 3px;
-            background: var(--primary-color);
-            border-radius: 3px 3px 0 0;
-        }
-
-        .form-container {
-            padding: 30px;
-        }
-
-        .error-message {
-            background-color: rgba(247, 37, 133, 0.1);
-            color: var(--danger-color);
-            padding: 15px;
-            border-radius: var(--border-radius);
-            margin-bottom: 25px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            border-left: 4px solid var(--danger-color);
-            animation: shake 0.5s ease-in-out;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        nav a:hover {
+            color: #cccccc;
+            font-weight: bold;
         }
 
         form {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
+            background: #ffffff;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
         }
 
         .form-group {
             margin-bottom: 15px;
         }
 
-        .form-group.full-width {
-            grid-column: span 2;
-        }
-
         .form-group label {
             display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--text-color);
+            margin-bottom: 5px;
+            font-weight: bold;
         }
 
-        .form-control {
+        .form-group input[type="text"],
+        .form-group input[type="tel"],
+        .form-group input[type="number"],
+        .form-group textarea {
             width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e9ecef;
-            border-radius: var(--border-radius);
-            font-size: 15px;
-            transition: var(--transition);
-            background-color: #f8f9fa;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
         }
 
-        .form-control:focus {
-            border-color: var(--accent-color);
-            box-shadow: 0 0 0 3px rgba(72, 149, 239, 0.2);
-            outline: none;
-            background-color: white;
-        }
-
-        textarea.form-control {
-            min-height: 120px;
-            resize: vertical;
+        .form-group textarea {
+            height: 100px;
         }
 
         .form-actions {
-            grid-column: span 2;
-            display: flex;
-            justify-content: flex-end;
-            gap: 15px;
             margin-top: 20px;
         }
 
-        .btn {
-            padding: 12px 25px;
-            font-size: 15px;
-            font-weight: 500;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+        button,.button {
+            background: #35424a;
+            color: #ffffff;
             border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 4px;
+            text-decoration: none;
+            display: inline-block;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-            color: white;
-            box-shadow: 0 4px 8px rgba(67, 97, 238, 0.2);
+        button:hover,.button:hover {
+            background: #e8491d;
         }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(67, 97, 238, 0.3);
+        .error-message {
+            background-color: #ffdddd;
+            border-left: 6px solid #f44336;
+            margin-bottom: 15px;
+            padding: 10px;
         }
 
-        .btn-secondary {
-            background: white;
-            color: var(--primary-color);
-            border: 2px solid var(--primary-color);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(67, 97, 238, 0.05);
-            transform: translateY(-2px);
-        }
-
-        .btn-danger {
-            background: white;
-            color: var(--danger-color);
-            border: 2px solid var(--danger-color);
-        }
-
-        .btn-danger:hover {
-            background: rgba(247, 37, 133, 0.05);
-            transform: translateY(-2px);
-        }
-
-        .floating-books {
-            position: absolute;
-            width: 100px;
-            height: 100px;
-            opacity: 0.1;
-            z-index: -1;
-        }
-
-        .book-1 {
-            top: 20px;
-            right: 20px;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%234361ee"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>') no-repeat;
-        }
-
-        .book-2 {
-            bottom: 20px;
-            left: 20px;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%234361ee"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>') no-repeat;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                margin: 20px;
-                width: calc(100% - 40px);
-            }
-
-            form {
-                grid-template-columns: 1fr;
-            }
-
-            .form-group.full-width {
-                grid-column: span 1;
-            }
-
-            .form-actions {
-                grid-column: span 1;
-                flex-direction: column;
-            }
-
-            .header-content {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-            }
-
-            .nav-tabs ul {
-                overflow-x: auto;
-                white-space: nowrap;
-                padding-bottom: 5px;
-            }
+        .error-message p {
+            margin: 0;
+            color: #d32f2f;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <div class="floating-books book-1"></div>
-    <div class="floating-books book-2"></div>
+    <header>
+        <h1>Add New Customer</h1>
+    </header>
 
-    <div class="header">
-        <div class="header-content">
-            <a href="dashboard.jsp" class="back-button">
-                <i class="fas fa-arrow-left"></i> Back to Dashboard
-            </a>
-            <div class="header-title">
-                <h1>Add New Customer</h1>
-                <p>Pahana Edu Bookshop Management System</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="nav-tabs">
+    <nav>
         <ul>
-            <li><a href="customer.jsp"><i class="fas fa-home"></i> Home</a></li>
-            <li class="active"><a href="customer?action=add"><i class="fas fa-user-plus"></i> Add Customer</a></li>
-            <li><a href="customer?action=list"><i class="fas fa-users"></i> View Customers</a></li>
+            <li><a href="customer.jsp">Home</a></li>
+            <li><a href="listCustomers.jsp">View All Customers</a></li>
         </ul>
-    </div>
+    </nav>
 
-    <div class="form-container">
+    <main>
         <c:if test="${not empty errorMessage}">
             <div class="error-message">
-                <i class="fas fa-exclamation-circle"></i>
                 <p>${errorMessage}</p>
             </div>
         </c:if>
 
         <form action="customer?action=insert" method="post">
             <div class="form-group">
-                <label for="accountNumber">Account Number</label>
-                <input type="text" id="accountNumber" name="accountNumber" class="form-control" required placeholder="Enter account number">
-            </div>
-
-            <div class="form-group">
-                <label for="name">Full Name</label>
-                <input type="text" id="name" name="name" class="form-control" required placeholder="Enter customer name">
-            </div>
-
-            <div class="form-group">
-                <label for="telephone">Telephone</label>
-                <input type="tel" id="telephone" name="telephone" class="form-control" required placeholder="Enter phone number">
-            </div>
-
-            <div class="form-group">
-                <label for="units_consumed">Units Consumed</label>
-                <input type="number" id="units_consumed" name="unitsConsumed" class="form-control" required placeholder="Enter units consumed">
-            </div>
-
-            <div class="form-group full-width">
-                <label for="address">Address</label>
-                <textarea id="address" name="address" class="form-control" required placeholder="Enter full address"></textarea>
+                <label for="accountNumber">Account Number:</label>
+                <input type="text" id="accountNumber" name="accountNumber" required>
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required>
+                <label for="address">Address:</label>
+                <input type="text" id="address" name="address" required>
+                <label for="telephone">Telephone:</label>
+                <input type="text" id="telephone" name="telephone" required>
+                <label for="units_consumed">Unit Consumed:</label>
+                <input type="text" id="units_consumed" name="unitsConsumed" required>
             </div>
 
             <div class="form-actions">
-                <button type="reset" class="btn btn-danger">
-                    <i class="fas fa-trash"></i> Clear
-                </button>
-                <a href="customer?action=list" class="btn btn-secondary">
-                    <i class="fas fa-times"></i> Cancel
-                </a>
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-save"></i> Save Customer
-                </button>
+                <button type="submit">Add Customer</button>
+                <button type="reset">Clear</button>
+                <a href="listCustomers.jsp" class="button">Cancel</a>
             </div>
         </form>
-    </div>
-</div>
+    </main>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+</div>
 </body>
 </html>

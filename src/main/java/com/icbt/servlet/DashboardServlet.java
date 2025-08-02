@@ -17,6 +17,7 @@ public class DashboardServlet extends HttpServlet {
 
         HttpSession session = request.getSession(false);
 
+        // Check if user is logged in
         if (session == null || session.getAttribute("username") == null) {
             response.sendRedirect("loginpage.jsp");
             return;
@@ -24,13 +25,6 @@ public class DashboardServlet extends HttpServlet {
 
         String username = (String) session.getAttribute("username");
         request.setAttribute("username", username);
-
-        String action = request.getParameter("action");
-
-        if (action != null && action.equals("list")) {
-             response.sendRedirect(request.getContextPath() + "/dashboard?action=list");
-        } else {
-            request.getRequestDispatcher("dashboard.jsp").forward(request, response);
-        }
+        request.getRequestDispatcher("dashboard.jsp").forward(request, response);
     }
 }

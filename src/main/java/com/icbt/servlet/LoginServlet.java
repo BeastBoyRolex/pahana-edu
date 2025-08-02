@@ -15,7 +15,7 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.getRequestDispatcher("/loginpage.jsp").forward(req, resp);
+        resp.sendRedirect(req.getContextPath() + "/loginpage.jsp");
     }
 
     @Override
@@ -26,10 +26,10 @@ public class LoginServlet extends HttpServlet {
         User user = loginService.login(username, password);
         if (user != null) {
             req.getSession().setAttribute("user", user);
-            resp.sendRedirect("welcome.jsp");
+            resp.sendRedirect("dashboard.jsp");
         } else {
             req.setAttribute("error", "Invalid username or password.");
-            req.getRequestDispatcher("/loginpage.jsp").forward(req, resp);
+            req.getRequestDispatcher("loginpage.jsp").forward(req, resp);
         }
     }
 }
