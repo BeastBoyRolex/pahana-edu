@@ -1,46 +1,73 @@
 package com.icbt.model;
 
 import java.util.Date;
-import java.util.List;
 
 public class Bill {
-    private String billId;
+    private int billId;
     private String accountNumber;
-    private Date billDate;
-    private Date dueDate;
-    private double totalAmount;
-    private String status;
-    private List<BillItem> items;
+    private Date billingDate;
+    private int unitsConsumed;
+    private double amount;
+    private String paymentStatus;
 
-    public Bill() {}
-
-    public Bill(String billId, String accountNumber, Date billDate, Date dueDate, double totalAmount, String status) {
-        this.billId = billId;
-        this.accountNumber = accountNumber;
-        this.billDate = billDate;
-        this.dueDate = dueDate;
-        this.totalAmount = totalAmount;
-        this.status = status;
+    public Bill() {
     }
 
-    public String getBillId() { return billId; }
-    public void setBillId(String billId) { this.billId = billId; }
+    public Bill(String accountNumber, Date billingDate,
+                int unitsConsumed, double amount, String paymentStatus) {
+        this.accountNumber = accountNumber;
+        this.billingDate = billingDate;
+        this.unitsConsumed = unitsConsumed;
+        this.amount = amount;
+        this.paymentStatus = paymentStatus;
+    }
 
-    public String getAccountNumber() { return accountNumber; }
-    public void setAccountNumber(String accountNumber) { this.accountNumber = accountNumber; }
+    // Getter and Setter methods
+    public int getBillId() {
+        return billId;
+    }
 
-    public Date getBillDate() { return billDate; }
-    public void setBillDate(Date billDate) { this.billDate = billDate; }
+    public void setBillId(int billId) {
+        this.billId = billId;
+    }
 
-    public Date getDueDate() { return dueDate; }
-    public void setDueDate(Date dueDate) { this.dueDate = dueDate; }
+    public String getAccountNumber() {
+        return accountNumber;
+    }
 
-    public double getTotalAmount() { return totalAmount; }
-    public void setTotalAmount(double totalAmount) { this.totalAmount = totalAmount; }
+    public void setAccountNumber(String accountNumber) {
+        this.accountNumber = accountNumber;
+    }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public Date getBillingDate() {
+        return billingDate;
+    }
 
-    public List<BillItem> getItems() { return items; }
-    public void setItems(List<BillItem> items) { this.items = items; }
+    public void setBillingDate(Date billingDate) {
+        this.billingDate = billingDate;
+    }
+
+    public int getUnitsConsumed() {
+        return unitsConsumed;
+    }
+
+    public void setUnitsConsumed(int unitsConsumed) {
+        this.unitsConsumed = unitsConsumed;
+    }
+
+    public double getAmount() {
+        return amount;
+    }
+
+    public void setAmount(double amount) {
+        this.amount = amount;
+    }
+
+    public String getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public void setPaymentStatus(String paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
 }
