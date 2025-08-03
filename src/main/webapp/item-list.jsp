@@ -6,7 +6,9 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page import="java.util.List" %>
+<%@ page import="com.icbt.model.Item" %> <%-- Replace with your actual package and class name --%>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -116,9 +118,6 @@
                 display: block;
                 overflow-x: auto;
             }
-
-
-
         }
     </style>
 </head>
@@ -141,22 +140,29 @@
         </tr>
         </thead>
         <tbody>
-        <c:forEach var="item" items="${items}">
-            <tr>
-                <td>${item.itemId}</td>
-                <td>${item.itemCode}</td>
-                <td>${item.title}</td>
-                <td>${item.author}</td>
-                <td>${item.price}</td>
-                <td>${item.quantity}</td>
-                <td>
-                    <a href="items?action=edit&id=${item.itemId}" class="btn btn-edit">Edit</a>
-                    <a href="items?action=delete&id=${item.itemId}" class="btn btn-delete"
-                       onclick="return confirm('Are you sure you want to delete this book?')">Delete</a>
-                    <a href="items?action=view&id=${item.itemId}" class="btn btn-view">View</a>
-                </td>
-            </tr>
-        </c:forEach>
+        <%
+            List<Item> items = (List<Item>) request.getAttribute("items");
+            if (items != null) {
+                for (Item item : items) {
+        %>
+        <tr>
+            <td><%= item.getItemId() %></td>
+            <td><%= item.getItemCode() %></td>
+            <td><%= item.getTitle() %></td>
+            <td><%= item.getAuthor() %></td>
+            <td><%= item.getPrice() %></td>
+            <td><%= item.getQuantity() %></td>
+            <td>
+                <a href="items?action=edit&id=<%= item.getItemId() %>" class="btn btn-edit">Edit</a>
+                <a href="items?action=delete&id=<%= item.getItemId() %>" class="btn btn-delete"
+                   onclick="return confirm('Are you sure you want to delete this book?')">Delete</a>
+                <a href="items?action=view&id=<%= item.getItemId() %>" class="btn btn-view">View</a>
+            </td>
+        </tr>
+        <%
+                }
+            }
+        %>
         </tbody>
     </table>
 </div>

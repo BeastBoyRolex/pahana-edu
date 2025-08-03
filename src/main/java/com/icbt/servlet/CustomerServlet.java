@@ -25,7 +25,7 @@ public class CustomerServlet extends HttpServlet {
 
         try {
             switch (action) {
-                case "new":
+                case "add":
                     showNewForm(request, response);
                     break;
                 case "edit":

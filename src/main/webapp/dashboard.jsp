@@ -84,12 +84,12 @@
     </div>
 
     <div class="button-container">
-        <a href="addCustomer.jsp" class="dashboard-button">Add Customer</a>
-        <a href="listCustomers" class="dashboard-button">List Customers</a>
-        <a href="addItem.jsp" class="dashboard-button">Add Item</a>
-        <a href="listItems" class="dashboard-button">List Items</a>
-        <a href="addBill.jsp" class="dashboard-button">Add Bill</a>
-        <a href="listBills" class="dashboard-button">List Bills</a>
+        <a href="customer?action=add" class="dashboard-button">Add Customer</a>
+        <a href="customer?action=list" class="dashboard-button">List Customers</a>
+        <a href="items?action=new" class="dashboard-button">Add Item</a>
+        <a href="items?action=list" class="dashboard-button">List Items</a>
+        <a href="bill?action=add" class="dashboard-button">Add Bill</a>
+        <a href="bill?action=list" class="dashboard-button">List Bills</a>
     </div>
 
     <a href="logout" class="dashboard-button logout-button">Logout</a>

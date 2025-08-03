@@ -107,7 +107,7 @@
 
     <nav>
         <ul>
-            <li><a href="customer.jsp">Home</a></li>
+            <li><a href="dashboard.jsp">Home</a></li>
             <li><a href="addCustomer.jsp">Add New Customer</a></li>
         </ul>
     </nav>

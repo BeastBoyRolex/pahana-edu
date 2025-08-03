@@ -152,9 +152,6 @@
 
         <button type="submit" class="btn-login">Login</button>
 
-        <div class="form-footer">
-            <a href="#" class="forgot-password">Forgot Password?</a>
-        </div>
     </form>
 </div>
 </body>
