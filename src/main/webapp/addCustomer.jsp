@@ -32,11 +32,41 @@
             color: #ffffff;
             padding: 20px 0;
             border-bottom: #e8491d 3px solid;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        header h1, header h2 {
-            margin: 0;
+        .header-content {
+            display: flex;
+            align-items: center;
+        }
+
+        .header-title {
             padding: 0 0 0 20px;
+        }
+
+        .back-button {
+            background: #e8491d;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+            margin-left: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .back-button:hover {
+            background: #d1401a;
+        }
+
+        .back-button:before {
+            content: "←";
+            margin-right: 5px;
         }
 
         nav {
@@ -134,13 +164,18 @@
 <body>
 <div class="container">
     <header>
-        <h1>Add New Customer</h1>
+        <div class="header-content">
+            <a href="dashboard.jsp" class="back-button">Back</a>
+            <div class="header-title">
+                <h1>Add New Customer</h1>
+            </div>
+        </div>
     </header>
 
     <nav>
         <ul>
             <li><a href="customer.jsp">Home</a></li>
-            <li><a href="listCustomers.jsp">View All Customers</a></li>
+            <li><a href="customer?action=list">View All Customers</a></li>
         </ul>
     </nav>
 
@@ -168,7 +203,7 @@
             <div class="form-actions">
                 <button type="submit">Add Customer</button>
                 <button type="reset">Clear</button>
-                <a href="listCustomers.jsp" class="button">Cancel</a>
+                <a href="customer?action=list" class="button">Cancel</a>
             </div>
         </form>
     </main>

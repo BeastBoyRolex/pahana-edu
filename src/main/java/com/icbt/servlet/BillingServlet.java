@@ -5,10 +5,12 @@ import com.icbt.model.Bill;
 import java.io.IOException;
 import java.util.List;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+@WebServlet("/bill")
 public class BillingServlet extends HttpServlet {
     private BillingService billingService;
 
