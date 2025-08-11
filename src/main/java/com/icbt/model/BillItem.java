@@ -1,21 +1,18 @@
 package com.icbt.model;
 
 public class BillItem {
-    private String billItemId;
-    private String billId;
-    private String itemId;
+    private int itemId;
+    private int billId;
     private String description;
     private int quantity;
     private double unitPrice;
     private double amount;
-    
+
     // Constructors
     public BillItem() {}
 
-    public BillItem(String billItemId, String billId, String itemId, String description, int quantity, double unitPrice, double amount) {
-        this.billItemId = billItemId;
+    public BillItem(int billId, String description, int quantity, double unitPrice, double amount) {
         this.billId = billId;
-        this.itemId = itemId;
         this.description = description;
         this.quantity = quantity;
         this.unitPrice = unitPrice;
@@ -23,14 +20,11 @@ public class BillItem {
     }
 
     // Getters and Setters
-    public String getBillItemId() { return billItemId; }
-    public void setBillItemId(String billItemId) { this.billItemId = billItemId; }
+    public int getItemId() { return itemId; }
+    public void setItemId(int itemId) { this.itemId = itemId; }
 
-    public String getBillId() { return billId; }
-    public void setBillId(String billId) { this.billId = billId; }
-
-    public String getItemId() { return itemId; }
-    public void setItemId(String itemId) { this.itemId = itemId; }
+    public int getBillId() { return billId; }
+    public void setBillId(int billId) { this.billId = billId; }
 
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }

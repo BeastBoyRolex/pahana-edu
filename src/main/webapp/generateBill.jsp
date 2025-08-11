@@ -1,6 +1,3 @@
-<%@ page import="com.icbt.model.Customer" %>
-<%@ page import="com.icbt.model.Item" %>
-<%@ page import="java.util.List" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -10,7 +7,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
   <style>
     :root {
       --primary-color: #4361ee;
@@ -268,6 +264,8 @@
 </head>
 <body>
 <div class="container">
+  <div class="floating-books book-1"></div>
+  <div class="floating-books book-2"></div>
 
   <div class="page-header">
     <h2><i class="fas fa-file-invoice-dollar"></i> Generate New Bill</h2>
@@ -276,35 +274,23 @@
     </a>
   </div>
 
-  <%-- Display error message if any --%>
-  <% if (request.getAttribute("error") != null) { %>
+  <%
+    String error = (String) request.getAttribute("error");
+    if (error != null && !error.isEmpty()) {
+  %>
   <div class="alert alert-danger">
-    <%= request.getAttribute("error") %>
+    <i class="fas fa-exclamation-circle"></i> <%= error %>
   </div>
   <% } %>
 
   <form action="bill" method="post">
     <input type="hidden" name="action" value="generate">
 
-    <!-- Customer dropdown -->
     <div class="mb-4">
-      <label for="accountNumber" class="form-label">Customer Account</label>
-      <select class="form-control" id="accountNumber" name="accountNumber" required>
-        <option value="">-- Select Customer --</option>
-        <%
-          List<Customer> customers = (List<Customer>) request.getAttribute("customers");
-          if (customers != null) {
-            for (Customer c : customers) {
-        %>
-        <option value="<%= c.getAccountNumber() %>"><%= c.getAccountNumber() %> - <%= c.getName() %></option>
-        <%
-            }
-          }
-        %>
-      </select>
+      <label for="accountNumber" class="form-label">Account Number</label>
+      <input type="text" class="form-control" id="accountNumber" name="accountNumber" required>
     </div>
 
-    <!-- Dates -->
     <div class="row mb-4">
       <div class="col-md-6">
         <label for="billDate" class="form-label">Bill Date</label>
@@ -316,45 +302,17 @@
       </div>
     </div>
 
-    <!-- Hidden options list (reusable for JS) -->
-    <select id="itemOptions" class="d-none">
-      <option value="">-- Select Item --</option>
-      <%
-        List<Item> items = (List<Item>) request.getAttribute("items");
-        if (items != null) {
-          for (Item it : items) {
-      %>
-      <option value="<%= it.getItemId() %>"><%= it.getTitle() %></option>
-      <%
-          }
-        }
-      %>
-    </select>
-
-    <!-- Bill items -->
     <h4 class="section-title">Bill Items</h4>
     <div id="items-container">
-      <!-- Initial row -->
       <div class="item-row row">
         <div class="col-md-5">
-          <select class="form-control" name="itemId[]" required>
-            <option value="">-- Select Item --</option>
-            <%
-              if (items != null) {
-                for (Item it : items) {
-            %>
-            <option value="<%= it.getItemId() %>"><%= it.getTitle() %></option>
-            <%
-                }
-              }
-            %>
-          </select>
+          <input type="text" class="form-control" name="description" placeholder="Item Description" required>
         </div>
         <div class="col-md-2">
-          <input type="number" class="form-control" name="quantity[]" placeholder="Quantity" min="1" required>
+          <input type="number" class="form-control" name="quantity" placeholder="Quantity" min="1" required>
         </div>
         <div class="col-md-3">
-          <input type="number" step="0.01" class="form-control" name="unitPrice[]" placeholder="Unit Price (Rs.)" min="0" required>
+          <input type="number" step="0.01" class="form-control" name="unitPrice" placeholder="Unit Price (Rs.)" min="0" required>
         </div>
         <div class="col-md-2">
           <button type="button" class="btn btn-danger remove-item">
@@ -371,7 +329,7 @@
       <button type="submit" class="btn btn-primary">
         <i class="fas fa-file-invoice"></i> Generate Bill
       </button>
-      <a href="bill?action=list" class="btn btn-outline-secondary">
+      <a href="listBills.jsp" class="btn btn-outline-secondary">
         <i class="fas fa-times"></i> Cancel
       </a>
     </div>
@@ -379,31 +337,28 @@
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
 <script>
   $(document).ready(function() {
-    // Add item row
     $('#add-item').click(function() {
-      const options = $('#itemOptions').html(); // reuse the hidden options
       const newRow = `
-            <div class="item-row row">
-                <div class="col-md-5">
-                    <select class="form-control" name="itemId[]" required>
-                        ${options}
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <input type="number" class="form-control" name="quantity[]" min="1" required>
-                </div>
-                <div class="col-md-3">
-                    <input type="number" step="0.01" class="form-control" name="unitPrice[]" min="0" required>
-                </div>
-                <div class="col-md-2">
-                    <button type="button" class="btn btn-danger remove-item">
-                        <i class="fas fa-trash"></i> Remove
-                    </button>
-                </div>
-            </div>
-            `;
+        <div class="item-row row">
+          <div class="col-md-5">
+            <input type="text" class="form-control" name="description" placeholder="Item Description" required>
+          </div>
+          <div class="col-md-2">
+            <input type="number" class="form-control" name="quantity" placeholder="Quantity" min="1" required>
+          </div>
+          <div class="col-md-3">
+            <input type="number" step="0.01" class="form-control" name="unitPrice" placeholder="Unit Price (Rs.)" min="0" required>
+          </div>
+          <div class="col-md-2">
+            <button type="button" class="btn btn-danger remove-item">
+              <i class="fas fa-trash"></i> Remove
+            </button>
+          </div>
+        </div>
+      `;
       $('#items-container').append(newRow);
     });
 
@@ -419,6 +374,7 @@
     // Set default dates
     const today = new Date().toISOString().split('T')[0];
     $('#billDate').val(today);
+
     const dueDate = new Date();
     dueDate.setDate(dueDate.getDate() + 30);
     $('#dueDate').val(dueDate.toISOString().split('T')[0]);

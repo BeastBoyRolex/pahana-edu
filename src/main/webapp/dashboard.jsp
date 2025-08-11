@@ -1,98 +1,264 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: LENOVO
-  Date: 7/26/2025
-  Time: 1:41 PM
-  To change this template use File | Settings | File Templates.
---%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard</title>
+    <title>Dashboard - Pahana Edu Bookshop</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f5f5f5;
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+            --success-color: #4cc9f0;
+            --danger-color: #f72585;
+            --warning-color: #f8961e;
+            --text-color: #2b2d42;
+            --light-color: #f8f9fa;
+            --border-radius: 12px;
+            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            min-height: 100vh;
+            color: var(--text-color);
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 100vh;
+            padding: 20px;
         }
 
         .dashboard-container {
-            width: 80%;
-            max-width: 1000px;
+            width: 90%;
+            max-width: 1200px;
             background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-            margin-top: 50px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 40px;
+            margin-top: 40px;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dashboard-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
         }
 
         .welcome-message {
-            font-size: 24px;
-            color: #333;
-            margin-bottom: 30px;
             text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+            padding-bottom: 20px;
+        }
+
+        .welcome-message h1 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--primary-color);
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .welcome-message p {
+            color: #7f8c8d;
+            font-size: 16px;
+        }
+
+        .welcome-message::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            border-radius: 3px;
         }
 
         .button-container {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin-top: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
         }
 
         .dashboard-button {
-            background-color: #146b65;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
             color: white;
             border: none;
-            padding: 15px;
+            padding: 20px;
             text-align: center;
             text-decoration: none;
-            display: inline-block;
             font-size: 16px;
-            border-radius: 4px;
+            font-weight: 500;
+            border-radius: var(--border-radius);
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 150px;
+            box-shadow: 0 4px 8px rgba(67, 97, 238, 0.2);
         }
 
         .dashboard-button:hover {
-            background-color: #45a049;
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(67, 97, 238, 0.3);
+        }
+
+        .dashboard-button i {
+            font-size: 32px;
+            margin-bottom: 15px;
+            color: white;
+        }
+
+        .dashboard-button span {
+            display: block;
+            margin-top: 5px;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .logout-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 40px;
         }
 
         .logout-button {
-            background-color: #b43127;
-            margin-top: 30px;
-            width: 97%;
+            background: linear-gradient(135deg, var(--danger-color), #f94144);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 8px rgba(247, 37, 133, 0.2);
+            width: auto;
         }
 
         .logout-button:hover {
-            background-color: #d32f2f;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(247, 37, 133, 0.3);
+        }
+
+        .floating-books {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            opacity: 0.1;
+            z-index: -1;
+        }
+
+        .book-1 {
+            top: 20px;
+            right: 20px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%234361ee"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>') no-repeat;
+        }
+
+        .book-2 {
+            bottom: 20px;
+            left: 20px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%234361ee"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>') no-repeat;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                width: 95%;
+                padding: 30px 20px;
+            }
+
+            .welcome-message h1 {
+                font-size: 26px;
+            }
+
+            .button-container {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
 <div class="dashboard-container">
+    <div class="floating-books book-1"></div>
+    <div class="floating-books book-2"></div>
+
     <div class="welcome-message">
-        Welcome, ${username}
-        <p>You have successfully logged in.</p>
+        <h1>Welcome, ${username}</h1>
+        <p>You have successfully logged in to Pahana Edu Bookshop Admin Panel</p>
     </div>
 
     <div class="button-container">
-        <a href="customer?action=add" class="dashboard-button">Add Customer</a>
-        <a href="customer?action=list" class="dashboard-button">List Customers</a>
-        <a href="items?action=new" class="dashboard-button">Add Item</a>
-        <a href="items?action=list" class="dashboard-button">List Items</a>
-        <a href="bill?action=add" class="dashboard-button">Add Bill</a>
-        <a href="bill?action=list" class="dashboard-button">List Bills</a>
+        <a href="customer?action=add" class="dashboard-button">
+            <i class="fas fa-user-plus"></i>
+            Add Customer
+            <span>Create new customer records</span>
+        </a>
+        <a href="customer?action=list" class="dashboard-button">
+            <i class="fas fa-users"></i>
+            List Customers
+            <span>View all customer information</span>
+        </a>
+        <a href="items?action=new" class="dashboard-button">
+            <i class="fas fa-book-medical"></i>
+            Add Item
+            <span>Add new books to inventory</span>
+        </a>
+        <a href="items?action=list" class="dashboard-button">
+            <i class="fas fa-book-open"></i>
+            List Items
+            <span>Browse all available books</span>
+        </a>
+        <a href="bill?action=generate" class="dashboard-button">
+            <i class="fas fa-file-invoice-dollar"></i>
+            Add Bill
+            <span>Create new invoices</span>
+        </a>
+        <a href="bill?action=list" class="dashboard-button">
+            <i class="fas fa-receipt"></i>
+            List Bills
+            <span>View all transactions</span>
+        </a>
     </div>
 
-    <a href="logout" class="dashboard-button logout-button">Logout</a>
+    <div class="logout-container">
+        <a href="logout" class="logout-button">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </div>
 </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
 </body>
 </html>

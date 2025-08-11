@@ -3,98 +3,123 @@ package com.icbt.service;
 import com.icbt.dao.BillDAO;
 import com.icbt.model.Bill;
 import com.icbt.model.BillItem;
-import com.icbt.model.Item;
-import java.util.ArrayList;
+import com.icbt.util.DBConnection;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Date;
 import java.util.List;
 
 public class BillService {
-    private final BillDAO billDAO;
-    private final ItemService itemService;
+    private BillDAO billDAO;
 
     public BillService() {
         this.billDAO = new BillDAO();
-        this.itemService = new ItemService();
     }
 
-    public boolean generateBill(Bill bill, List<BillItem> items) {
+    public Bill generateBill(String accountNumber, List<BillItem> items, Date billDate, Date dueDate) {
         try {
-            // Validate inputs
-            if (bill == null) {
-                throw new IllegalArgumentException("Bill cannot be null");
+            if (accountNumber == null || accountNumber.isEmpty()) {
+                throw new IllegalArgumentException("Account number cannot be empty");
             }
             if (items == null || items.isEmpty()) {
                 throw new IllegalArgumentException("Bill items cannot be empty");
             }
-            if (bill.getBillDate() == null || bill.getDueDate() == null) {
+            if (billDate == null || dueDate == null) {
                 throw new IllegalArgumentException("Dates cannot be null");
             }
-            if (bill.getBillDate().after(bill.getDueDate())) {
+            if (billDate.after(dueDate)) {
                 throw new IllegalArgumentException("Due date must be after bill date");
             }
 
-            // Calculate total amount and set descriptions
-            double totalAmount = 0.0;
-            for (BillItem item : items) {
-                // Get item details to set description
-                Item dbItem = itemService.getItemById(item.getItemId());
-                if (dbItem == null) {
-                    throw new RuntimeException("Item not found: " + item.getItemId());
-                }
-                
-                // Set description from item title
-                item.setDescription(dbItem.getTitle());
-                
-                // Calculate amount for this item
-                double itemAmount = item.getQuantity() * item.getUnitPrice();
-                item.setAmount(itemAmount);
-                totalAmount += itemAmount;
-                
-                // Check stock availability
-//                if (dbItem.getQuantity() < item.getQuantity()) {
-//                    throw new RuntimeException("Not enough stock for item: " + dbItem.getTitle());
-//                }
-            }
-            
-            bill.setTotalAmount(totalAmount);
+            double totalAmount = calculateTotalAmount(items);
+            Bill bill = new Bill(accountNumber, billDate, dueDate, totalAmount, "PENDING");
+            bill.setItems(items);
 
-            // Generate bill ID if not set
-            if (bill.getBillId() == null || bill.getBillId().isEmpty()) {
-                bill.setBillId("BILL-" + System.currentTimeMillis());
-            }
-
-            // Set default status if not set
-            if (bill.getStatus() == null || bill.getStatus().isEmpty()) {
-                bill.setStatus("Pending");
-            }
-
-            // Update stock and generate bill
-            for (BillItem item : items) {
-                itemService.updateStock(item.getItemId(), -item.getQuantity());
-            }
-
-            return billDAO.generateBill(bill, items);
+            return saveBill(bill);
         } catch (Exception e) {
             throw new RuntimeException("Error generating bill: " + e.getMessage(), e);
         }
     }
 
-    public Bill generateBill(String accountNumber, List<BillItem> items, Date billDate, Date dueDate) {
-        Bill bill = new Bill();
-        bill.setAccountNumber(accountNumber);
-        bill.setBillDate(billDate);
-        bill.setDueDate(dueDate);
+    public Bill saveBill(Bill bill) {
+        Connection connection = null;
+        try {
+            connection = DBConnection.getConnection();
+            connection.setAutoCommit(false); // Start transaction
 
-        if (!generateBill(bill, items)) {
-            throw new RuntimeException("Failed to generate bill");
+            // Save bill
+            String billSql = "INSERT INTO bills (account_number, bill_date, due_date, total_amount, payment_status) " +
+                    "VALUES (?, ?, ?, ?, ?)";
+
+            PreparedStatement billStmt = connection.prepareStatement(billSql, Statement.RETURN_GENERATED_KEYS);
+            billStmt.setString(1, bill.getAccountNumber());
+            billStmt.setDate(2, new java.sql.Date(bill.getBillDate().getTime()));
+            billStmt.setDate(3, new java.sql.Date(bill.getDueDate().getTime()));
+            billStmt.setDouble(4, bill.getTotalAmount());
+            billStmt.executeUpdate();
+
+            // Get generated bill ID
+            ResultSet rs = billStmt.getGeneratedKeys();
+            int billId = 0;
+            if (rs.next()) {
+                billId = rs.getInt(1);
+                bill.setBillId(billId);
+            }
+
+            // Save items
+            String itemSql = "INSERT INTO bill_items (bill_id, description, quantity, unit_price, amount) " +
+                    "VALUES (?, ?, ?, ?, ?)";
+
+            PreparedStatement itemStmt = connection.prepareStatement(itemSql);
+            for (BillItem item : bill.getItems()) {
+                itemStmt.setInt(1, billId);
+                itemStmt.setString(2, item.getDescription());
+                itemStmt.setInt(3, item.getQuantity());
+                itemStmt.setDouble(4, item.getUnitPrice());
+                itemStmt.setDouble(5, item.getAmount());
+                itemStmt.addBatch();
+            }
+            itemStmt.executeBatch();
+
+            connection.commit(); // Commit transaction
+            return bill;
+
+        } catch (SQLException e) {
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            throw new RuntimeException("Failed to save bill", e);
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
-        return bill;
     }
 
-    public Bill getBillById(String billId) {
+    private double calculateTotalAmount(List<BillItem> items) {
+        double total = 0;
+        for  (BillItem item : items) {
+            total += item.getAmount();
+        }
+        return total;
+    }
+
+    public Bill getBill(int billId) {
         try {
-            if (billId == null || billId.isEmpty()) {
-                throw new IllegalArgumentException("Bill ID cannot be empty");
+            if (billId <= 0) {
+                throw new IllegalArgumentException("Invalid bill ID");
             }
             Bill bill = billDAO.getBillById(billId);
             if (bill == null) {
@@ -106,14 +131,14 @@ public class BillService {
         }
     }
 
-    public List<Bill> getBillsByCustomer(String accountNumber) {
+    public List<Bill> getCustomerBills(String accountNumber) {
         try {
             if (accountNumber == null || accountNumber.isEmpty()) {
                 throw new IllegalArgumentException("Account number cannot be empty");
             }
-            List<Bill> bills = billDAO.getBillsByCustomer(accountNumber);
+            List<Bill> bills = billDAO.getBillsByAccountNumber(accountNumber);
             if (bills == null) {
-                return new ArrayList<>();
+                throw new RuntimeException("No bills found for account: " + accountNumber);
             }
             return bills;
         } catch (Exception e) {
@@ -121,33 +146,32 @@ public class BillService {
         }
     }
 
-    public List<Bill> getAllBills() {
+    public void updateBillStatus(int billId, String status) {
         try {
-            List<Bill> bills = billDAO.getAllBills();
-            if (bills == null) {
-                return new ArrayList<>();
-            }
-            return bills;
-        } catch (Exception e) {
-            throw new RuntimeException("Error retrieving all bills: " + e.getMessage(), e);
-        }
-    }
-
-    public boolean updateBillStatus(String billId, String status) {
-        try {
-            if (billId == null || billId.isEmpty()) {
-                throw new IllegalArgumentException("Bill ID cannot be empty");
+            if (billId <= 0) {
+                throw new IllegalArgumentException("Invalid bill ID");
             }
             if (status == null || status.isEmpty()) {
                 throw new IllegalArgumentException("Status cannot be empty");
             }
-            return billDAO.updateBillStatus(billId, status);
+            if (!billDAO.updateBillStatus(billId, status)) {
+                throw new RuntimeException("Failed to update bill status");
+            }
         } catch (Exception e) {
             throw new RuntimeException("Error updating bill status: " + e.getMessage(), e);
         }
     }
 
-    public void markBillAsPaid(String billId) {
-        updateBillStatus(billId, "PAID");
+    public void markBillAsPaid(int billId) {
+        try {
+            if (billId <= 0) {
+                throw new IllegalArgumentException("Invalid bill ID");
+            }
+            if (!billDAO.updateBillStatus(billId, "PAID")) {
+                throw new RuntimeException("Failed to mark bill as paid");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error marking bill as paid: " + e.getMessage(), e);
+        }
     }
 }

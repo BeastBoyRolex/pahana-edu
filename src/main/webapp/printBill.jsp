@@ -1,300 +1,343 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="java.util.List" %>
-<%@ page import="com.icbt.model.Bill" %>
-<%@ page import="com.icbt.model.BillItem" %>
-<%@ page import="java.text.NumberFormat" %>
-<%@ page import="java.text.SimpleDateFormat" %>
+<%@page import="com.icbt.model.Bill, com.icbt.model.BillItem, java.util.List, java.text.SimpleDateFormat"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
+<%
+  Bill bill = (Bill) request.getAttribute("bill");
+  List<BillItem> items = (List<BillItem>) request.getAttribute("items");
+  if (bill == null) {
+    response.sendRedirect("bill?action=generate");
+    return;
+  }
+
+  SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+%>
 <head>
-  <meta charset="UTF-8">
-  <title>Print Bill - Pahana Edu Bookshop</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>Pahana Edu - Bill Receipt</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
+    :root {
+      --primary-color: #4361ee;
+      --secondary-color: #3a0ca3;
+      --accent-color: #4cc9f0;
+      --success-color: #2ecc71;
+      --warning-color: #f39c12;
+      --danger-color: #e74c3c;
+      --light-color: #f8f9fa;
+      --dark-color: #212529;
+    }
+
     @media print {
-      body { margin: 0; padding: 20px; }
-      .no-print { display: none !important; }
-      .page-break { page-break-before: always; }
+      body * {
+        visibility: hidden;
+      }
+      .print-content, .print-content * {
+        visibility: visible;
+      }
+      .print-content {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+      }
+      .no-print {
+        display: none !important;
+      }
     }
 
     body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 20px;
-      background: white;
-      color: #333;
-      line-height: 1.4;
+      background-color: #f5f7ff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
-    .container {
+    .invoice-container {
       max-width: 800px;
-      margin: 0 auto;
+      margin: 2rem auto;
       background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
     }
 
-    .bill-header {
+    .invoice-header {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      padding: 2rem;
       text-align: center;
-      margin-bottom: 30px;
-      padding-bottom: 20px;
-      border-bottom: 2px solid #333;
     }
 
-    .bill-header h1 {
-      color: #333;
-      margin: 0 0 10px 0;
-      font-size: 28px;
-      font-weight: bold;
+    .invoice-title {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
     }
 
-    .bill-header p {
-      margin: 5px 0;
-      font-size: 14px;
-      color: #666;
+    .invoice-subtitle {
+      font-size: 1.1rem;
+      opacity: 0.9;
     }
 
-    .bill-info {
-      margin-bottom: 30px;
+    .invoice-body {
+      padding: 2.5rem;
     }
 
-    .bill-info .row {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 20px;
+    .invoice-section {
+      margin-bottom: 2rem;
     }
 
-    .bill-info .col {
-      flex: 1;
+    .section-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--primary-color);
+      border-bottom: 2px solid var(--primary-color);
+      padding-bottom: 0.5rem;
+      margin-bottom: 1.5rem;
     }
 
-    .bill-info h3 {
-      color: #333;
-      margin: 0 0 10px 0;
-      font-size: 16px;
-      font-weight: bold;
+    .company-info, .customer-info {
+      line-height: 1.6;
     }
 
-    .bill-info p {
-      margin: 5px 0;
-      font-size: 14px;
+    .info-label {
+      font-weight: 600;
+      color: var(--dark-color);
+    }
+
+    .invoice-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .invoice-table th {
+      background-color: #f8f9fa;
+      padding: 12px 15px;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    .invoice-table td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .invoice-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .total-row {
+      font-weight: 700;
+      font-size: 1.1rem;
     }
 
     .status-badge {
       display: inline-block;
-      padding: 5px 12px;
-      border-radius: 15px;
-      font-size: 12px;
-      font-weight: bold;
-      text-transform: uppercase;
-    }
-
-    .status-pending {
-      background-color: #fff3cd;
-      color: #856404;
-      border: 1px solid #ffeaa7;
+      padding: 0.35rem 0.75rem;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 0.85rem;
     }
 
     .status-paid {
-      background-color: #d4edda;
-      color: #155724;
-      border: 1px solid #c3e6cb;
+      background-color: rgba(46, 204, 113, 0.1);
+      color: var(--success-color);
     }
 
-    .table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 30px;
+    .status-pending {
+      background-color: rgba(231, 76, 60, 0.1);
+      color: var(--danger-color);
     }
 
-    .table th,
-    .table td {
-      border: 1px solid #ddd;
-      padding: 12px;
-      text-align: left;
-    }
-
-    .table th {
+    .invoice-footer {
       background-color: #f8f9fa;
-      font-weight: bold;
-      color: #333;
-    }
-
-    .table tbody tr:nth-child(even) {
-      background-color: #f9f9f9;
-    }
-
-    .total-row {
-      background-color: #f8f9fa !important;
-      font-weight: bold;
-    }
-
-    .total-row td {
-      font-size: 16px;
-    }
-
-    .bill-footer {
-      margin-top: 40px;
-      padding-top: 20px;
-      border-top: 1px solid #ddd;
+      padding: 1.5rem 2.5rem;
       text-align: center;
+      border-top: 1px solid #eee;
     }
 
-    .bill-footer p {
-      margin: 10px 0;
-      font-size: 14px;
+    .thank-you {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--primary-color);
+      margin-bottom: 0.5rem;
+    }
+
+    .contact-info {
       color: #666;
+      font-size: 0.95rem;
     }
 
-    .print-actions {
-      margin-bottom: 30px;
-      text-align: center;
-      padding: 20px;
-      background-color: #f8f9fa;
-      border-radius: 8px;
+    .action-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
     }
 
-    .btn {
-      display: inline-block;
-      padding: 10px 20px;
-      margin: 5px;
-      background-color: #007bff;
-      color: white;
-      text-decoration: none;
-      border-radius: 5px;
+    .btn-print {
+      background-color: var(--primary-color);
       border: none;
-      cursor: pointer;
-      font-size: 14px;
+      padding: 0.6rem 1.5rem;
+      border-radius: 50px;
+      color: white;
+      font-weight: 500;
+      transition: all 0.3s ease;
     }
 
-    .btn:hover {
-      background-color: #0056b3;
+    .btn-print:hover {
+      background-color: var(--secondary-color);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
-    .btn-secondary {
-      background-color: #6c757d;
+    .btn-back {
+      background-color: white;
+      border: 2px solid var(--primary-color);
+      color: var(--primary-color);
+      padding: 0.6rem 1.5rem;
+      border-radius: 50px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
-    .btn-secondary:hover {
-      background-color: #545b62;
+    .btn-back:hover {
+      background-color: var(--primary-color);
+      color: white;
+      transform: translateX(-3px);
     }
 
-    @media screen and (max-width: 768px) {
-      .bill-info .row {
-        flex-direction: column;
-      }
-      
-      .bill-info .col {
-        margin-bottom: 20px;
-      }
-      
-      .table {
-        font-size: 12px;
-      }
-      
-      .table th,
-      .table td {
-        padding: 8px;
-      }
+    .watermark {
+      position: fixed;
+      opacity: 0.05;
+      font-size: 20rem;
+      font-weight: 800;
+      color: var(--primary-color);
+      z-index: -1;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-15deg);
+      pointer-events: none;
+      user-select: none;
     }
   </style>
 </head>
 <body>
-<div class="container">
-  <div class="print-actions no-print">
-    <h3>Print Preview</h3>
-    <p>This is a printer-friendly version of your bill. Use the print button below to print or save as PDF.</p>
-    <button onclick="window.print()" class="btn">🖨️ Print Bill</button>
-    <a href="bill?action=view&billId=<%= request.getParameter("billId") %>" class="btn btn-secondary">← Back to View</a>
-    <a href="bill?action=list" class="btn btn-secondary">📋 All Bills</a>
+<div class="container py-4">
+  <div class="action-buttons no-print">
+    <button onclick="window.print()" class="btn-print">
+      <i class="fas fa-print me-2"></i>Print Receipt
+    </button>
+    <a href="bill?action=list&accountNumber=<%= bill.getAccountNumber() %>" class="btn-back">
+      <i class="fas fa-arrow-left"></i>Back to Bills
+    </a>
   </div>
 
-  <div class="bill-header">
-    <h1>📚 Pahana Edu Bookshop</h1>
-    <p>123 Book Street, Colombo, Sri Lanka</p>
-    <p>📞 Phone: +94 11 2345678 | 📧 Email: info@pahanaedu.lk</p>
-    <p>🌐 Website: www.pahanaedu.lk</p>
-  </div>
-
-  <%
-    // Get the bill object from request
-    Bill bill = (Bill) request.getAttribute("bill");
-
-    // Setup formatters
-    NumberFormat currencyFormat = NumberFormat.getCurrencyInstance();
-    currencyFormat.setCurrency(java.util.Currency.getInstance("LKR"));
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-  %>
-
-  <div class="bill-info">
-    <div class="row">
-      <div class="col">
-        <h3>👤 Bill To:</h3>
-        <p><strong>Account Number:</strong> <%= bill.getAccountNumber() %></p>
-        <p><strong>Date:</strong> <%= dateFormat.format(bill.getBillDate()) %></p>
+  <div class="print-content">
+    <div class="invoice-container">
+      <div class="invoice-header">
+        <h1 class="invoice-title">INVOICE RECEIPT</h1>
+        <p class="invoice-subtitle">Thank you for your business</p>
       </div>
-      <div class="col">
-        <h3>📄 Invoice Details:</h3>
-        <p><strong>Bill ID:</strong> #<%= bill.getBillId() %></p>
-        <p><strong>Due Date:</strong> <%= dateFormat.format(bill.getDueDate()) %></p>
-        <p><strong>Status:</strong>
-          <span class="status-badge <%= bill.getStatus().equals("PENDING") ? "status-pending" : "status-paid" %>">
-            <%= bill.getStatus() %>
-          </span>
-        </p>
+
+      <div class="invoice-body">
+        <div class="row mb-4">
+          <div class="col-md-6">
+            <div class="company-info">
+              <h3 class="section-title">From</h3>
+              <p><span class="info-label">Pahana Edu</span></p>
+              <p>123 Bookshop Street</p>
+              <p>Colombo, Sri Lanka</p>
+              <p><span class="info-label">Phone:</span> +94 11 2345678</p>
+              <p><span class="info-label">Email:</span> info@pahanaedu.lk</p>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="customer-info">
+              <h3 class="section-title">Bill To</h3>
+              <p><span class="info-label">Account #:</span> <%= bill.getAccountNumber() %></p>
+              <p><span class="info-label">Invoice #:</span> <%= bill.getBillId() %></p>
+              <p><span class="info-label">Date:</span> <%= dateFormat.format(bill.getBillDate()) %></p>
+              <p><span class="info-label">Due Date:</span> <%= dateFormat.format(bill.getDueDate()) %></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="invoice-section">
+          <h3 class="section-title">Payment Information</h3>
+          <div class="row">
+            <div class="col-md-6">
+              <p><span class="info-label">Payment Method:</span> Cash</p>
+            </div>
+            <div class="col-md-6">
+              <p>
+                <span class="info-label">Status:</span>
+                <span class="status-badge <%= bill.getPaymentStatus().equalsIgnoreCase("PAID") ? "status-paid" : "status-pending" %>">
+                  <%= bill.getPaymentStatus() %>
+                </span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="invoice-section">
+          <h3 class="section-title">Invoice Details</h3>
+          <table class="invoice-table">
+            <thead>
+            <tr>
+              <th>Description</th>
+              <th>Quantity</th>
+              <th>Unit Price</th>
+              <th>Amount</th>
+            </tr>
+            </thead>
+            <tbody>
+            <% for (BillItem item : items) { %>
+            <tr>
+              <td><%= item.getDescription() %></td>
+              <td><%= item.getQuantity() %></td>
+              <td>Rs. <%= String.format("%.2f", item.getUnitPrice()) %></td>
+              <td>Rs. <%= String.format("%.2f", item.getAmount()) %></td>
+            </tr>
+            <% } %>
+            </tbody>
+            <tfoot>
+            <tr class="total-row">
+              <td colspan="3">Total Due</td>
+              <td>Rs. <%= String.format("%.2f", bill.getTotalAmount()) %></td>
+            </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+
+      <div class="invoice-footer">
+        <p class="thank-you">Thank you for your business!</p>
+        <p class="contact-info">For any inquiries, please contact: +94 11 2345678 | info@pahanaedu.lk</p>
       </div>
     </div>
   </div>
 
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Description</th>
-        <th>Quantity</th>
-        <th>Unit Price</th>
-        <th>Amount</th>
-      </tr>
-    </thead>
-    <tbody>
-    <%
-      // Loop through bill items
-      if (bill.getItems() != null) {
-        for (BillItem item : bill.getItems()) {
-    %>
-      <tr>
-        <td><%= item.getDescription() != null ? item.getDescription() : "N/A" %></td>
-        <td><%= item.getQuantity() %></td>
-        <td>Rs. <%= String.format("%,.2f", item.getUnitPrice()) %></td>
-        <td>Rs. <%= String.format("%,.2f", item.getAmount()) %></td>
-      </tr>
-    <%
-        }
-      }
-    %>
-    </tbody>
-    <tfoot>
-      <tr class="total-row">
-        <td colspan="3" style="text-align: right;"><strong>Total Amount:</strong></td>
-        <td><strong>Rs. <%= String.format("%,.2f", bill.getTotalAmount()) %></strong></td>
-      </tr>
-    </tfoot>
-  </table>
-
-  <div class="bill-footer">
-    <p><strong>Thank you for your business!</strong></p>
-    <p>Please make payment by the due date to avoid any late fees.</p>
-    <p>For any questions, please contact us at info@pahanaedu.lk</p>
-    <p>Generated on: <%= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date()) %></p>
-  </div>
+  <div class="watermark no-print">PAHANA EDU</div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-  // Auto-print when page loads (optional)
-  // window.onload = function() {
-  //   window.print();
-  // };
+  document.addEventListener('DOMContentLoaded', function() {
+    const invoice = document.querySelector('.invoice-container');
+    invoice.style.opacity = '0';
+    invoice.style.transform = 'translateY(20px)';
+    invoice.style.transition = 'all 0.5s ease';
 
-  // Handle print completion
-  window.onafterprint = function() {
-    console.log('Print completed');
-  };
+    setTimeout(() => {
+      invoice.style.opacity = '1';
+      invoice.style.transform = 'translateY(0)';
+    }, 100);
+  });
 </script>
 </body>
 </html>

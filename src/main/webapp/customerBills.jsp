@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.util.List" %>
 <%@ page import="com.icbt.model.Bill" %>
+<%@ page import="java.text.NumberFormat" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 <!DOCTYPE html>
 <html>
@@ -10,7 +11,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
   <style>
     :root {
       --primary-color: #4361ee;
@@ -36,7 +36,7 @@
     }
 
     .container {
-      max-width: 1000px;
+      max-width: 1200px;
       margin: 30px auto;
       background: white;
       border-radius: var(--border-radius);
@@ -91,18 +91,9 @@
       border-radius: 3px;
     }
 
-    .customer-info {
-      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-      padding: 20px;
-      border-radius: var(--border-radius);
-      margin-bottom: 25px;
-      border-left: 4px solid var(--accent-color);
-    }
-
-    .customer-info h4 {
-      color: var(--primary-color);
-      margin-bottom: 15px;
-      font-weight: 600;
+    .btn-group {
+      display: flex;
+      gap: 10px;
     }
 
     .btn {
@@ -128,20 +119,27 @@
       color: white;
     }
 
-    .btn-secondary {
-      background-color: #6c757d;
-      color: white;
-      border: none;
+    .btn-outline-primary {
+      border: 2px solid var(--primary-color);
+      color: var(--primary-color);
+      background: transparent;
     }
 
-    .btn-secondary:hover {
-      background-color: #5a6268;
-      color: white;
+    .btn-outline-primary:hover {
+      background: rgba(67, 97, 238, 0.05);
+      color: var(--primary-color);
+      transform: translateY(-2px);
     }
 
-    .btn-sm {
-      padding: 5px 10px;
-      font-size: 0.875rem;
+    .btn-back {
+      background: rgba(255, 255, 255, 0.2);
+      color: var(--primary-color);
+      border: 2px solid var(--primary-color);
+    }
+
+    .btn-back:hover {
+      background: rgba(67, 97, 238, 0.05);
+      transform: translateY(-2px);
     }
 
     .alert {
@@ -150,91 +148,134 @@
       margin-bottom: 25px;
     }
 
+    .alert-success {
+      background-color: rgba(40, 167, 69, 0.1);
+      color: var(--success-color);
+      border-left: 4px solid var(--success-color);
+    }
+
     .alert-danger {
       background-color: rgba(220, 53, 69, 0.1);
       color: var(--danger-color);
       border-left: 4px solid var(--danger-color);
     }
 
+    .alert-info {
+      background-color: rgba(23, 162, 184, 0.1);
+      color: #17a2b8;
+      border-left: 4px solid #17a2b8;
+    }
+
+    .table-container {
+      overflow-x: auto;
+      border-radius: var(--border-radius);
+      margin: 30px 0;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
     .table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      background: white;
       border-radius: var(--border-radius);
       overflow: hidden;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
 
-    .table thead th {
-      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    .table th {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
       color: white;
-      border: none;
       font-weight: 600;
-      padding: 15px;
+      text-align: left;
+      padding: 16px 20px;
+      position: sticky;
+      top: 0;
     }
 
-    .table tbody tr {
-      transition: var(--transition);
+    .table td {
+      padding: 14px 20px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      vertical-align: middle;
     }
 
-    .table tbody tr:hover {
+    .table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .table tr:hover td {
       background-color: rgba(72, 149, 239, 0.05);
     }
 
-    .status-badge {
-      padding: 5px 12px;
-      border-radius: 20px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      text-transform: uppercase;
+    .table th:first-child {
+      border-top-left-radius: var(--border-radius);
+    }
+
+    .table th:last-child {
+      border-top-right-radius: var(--border-radius);
     }
 
     .status-pending {
-      background-color: rgba(255, 193, 7, 0.2);
-      color: #856404;
+      color: var(--danger-color);
+      font-weight: 500;
     }
 
     .status-paid {
-      background-color: rgba(40, 167, 69, 0.2);
-      color: #155724;
+      color: var(--success-color);
+      font-weight: 500;
     }
 
-    .no-bills {
-      text-align: center;
-      padding: 60px 20px;
-      color: #6c757d;
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
     }
 
-    .no-bills i {
-      font-size: 4rem;
-      margin-bottom: 20px;
-      opacity: 0.3;
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 14px;
+      border-radius: 6px;
     }
 
-    .summary-stats {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
-      margin-bottom: 25px;
+    .btn-info {
+      background-color: #17a2b8;
+      color: white;
+      border: none;
     }
 
-    .stat-card {
-      background: white;
-      padding: 20px;
-      border-radius: var(--border-radius);
-      text-align: center;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      border-top: 4px solid var(--accent-color);
+    .btn-info:hover {
+      background-color: #138496;
+      color: white;
     }
 
-    .stat-card h3 {
-      color: var(--primary-color);
-      font-size: 2rem;
-      margin: 0;
-      font-weight: 700;
+    .btn-success {
+      background-color: var(--success-color);
+      color: white;
+      border: none;
     }
 
-    .stat-card p {
-      color: #6c757d;
-      margin: 5px 0 0 0;
-      font-size: 0.9rem;
+    .btn-success:hover {
+      background-color: #218838;
+      color: white;
+    }
+
+    .floating-books {
+      position: absolute;
+      width: 100px;
+      height: 100px;
+      opacity: 0.1;
+      z-index: -1;
+    }
+
+    .book-1 {
+      top: 20px;
+      right: 20px;
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%234361ee"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>') no-repeat;
+    }
+
+    .book-2 {
+      bottom: 20px;
+      left: 20px;
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%234361ee"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>') no-repeat;
     }
 
     @media (max-width: 768px) {
@@ -248,176 +289,128 @@
         align-items: flex-start;
       }
 
-      .table-responsive {
-        font-size: 0.875rem;
+      .btn-group {
+        width: 100%;
+        flex-direction: column;
       }
 
       .btn {
         width: 100%;
         justify-content: center;
-        margin-bottom: 10px;
       }
 
-      .summary-stats {
-        grid-template-columns: 1fr;
+      .action-buttons {
+        flex-direction: column;
       }
     }
   </style>
 </head>
 <body>
 <div class="container">
+  <div class="floating-books book-1"></div>
+  <div class="floating-books book-2"></div>
+
   <div class="page-header">
-    <h2><i class="fas fa-user-file-invoice"></i> Customer Bills</h2>
     <div>
-      <a href="bill?action=generate" class="btn btn-primary">
-        <i class="fas fa-plus"></i> Generate New Bill
+      <h2>Bills for Account: <%= request.getAttribute("accountNumber") %></h2>
+    </div>
+    <div class="btn-group">
+      <a href="generateBill.jsp" class="btn btn-primary">
+        <i class="fas fa-file-invoice-dollar"></i> Generate New Bill
       </a>
-      <a href="bill?action=list" class="btn btn-secondary">
-        <i class="fas fa-arrow-left"></i> All Bills
+      <a href="javascript:history.back()" class="btn btn-back">
+        <i class="fas fa-arrow-left"></i> Back
       </a>
     </div>
   </div>
-
-  <%-- Display error message if any --%>
-  <% if (request.getAttribute("errorMessage") != null) { %>
-  <div class="alert alert-danger">
-    <i class="fas fa-exclamation-triangle"></i>
-    <%= request.getAttribute("errorMessage") %>
-  </div>
-  <% } %>
 
   <%
-    String accountNumber = (String) request.getAttribute("accountNumber");
-    List<Bill> bills = (List<Bill>) request.getAttribute("bills");
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    
-    if (bills != null && !bills.isEmpty()) {
-      // Calculate summary statistics
-      double totalAmount = 0.0;
-      int pendingBills = 0;
-      int paidBills = 0;
-      
-      for (Bill bill : bills) {
-        totalAmount += bill.getTotalAmount();
-        if (bill.getStatus().equals("PENDING")) {
-          pendingBills++;
-        } else {
-          paidBills++;
-        }
-      }
+    String message = (String) request.getAttribute("message");
+    if (message != null && !message.isEmpty()) {
+  %>
+  <div class="alert alert-success">
+    <i class="fas fa-check-circle"></i> <%= message %>
+  </div>
+  <%
+    }
+    String error = (String) request.getAttribute("error");
+    if (error != null && !error.isEmpty()) {
+  %>
+  <div class="alert alert-danger">
+    <i class="fas fa-exclamation-circle"></i> <%= error %>
+  </div>
+  <%
+    }
   %>
 
-  <div class="customer-info">
-    <h4><i class="fas fa-user"></i> Customer Information</h4>
-    <p><strong>Account Number:</strong> <%= accountNumber %></p>
-    <p><strong>Total Bills:</strong> <%= bills.size() %></p>
-  </div>
+  <%
+    List<Bill> bills = (List<Bill>) request.getAttribute("bills");
+    NumberFormat currencyFormat = NumberFormat.getCurrencyInstance();
+    currencyFormat.setCurrency(java.util.Currency.getInstance("LKR"));
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+  %>
 
-  <div class="summary-stats">
-    <div class="stat-card">
-      <h3><%= bills.size() %></h3>
-      <p>Total Bills</p>
-    </div>
-    <div class="stat-card">
-      <h3>Rs. <%= String.format("%,.2f", totalAmount) %></h3>
-      <p>Total Amount</p>
-    </div>
-    <div class="stat-card">
-      <h3><%= pendingBills %></h3>
-      <p>Pending Bills</p>
-    </div>
-    <div class="stat-card">
-      <h3><%= paidBills %></h3>
-      <p>Paid Bills</p>
-    </div>
-  </div>
-
-  <div class="table-responsive">
+  <div class="table-container">
     <table class="table table-hover">
       <thead>
-        <tr>
-          <th>Bill ID</th>
-          <th>Bill Date</th>
-          <th>Due Date</th>
-          <th>Total Amount</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
+      <tr>
+        <th>Bill ID</th>
+        <th>Bill Date</th>
+        <th>Due Date</th>
+        <th>Total Amount</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
       </thead>
       <tbody>
-        <% for (Bill bill : bills) { %>
-        <tr>
-          <td>
-            <strong><%= bill.getBillId() %></strong>
-          </td>
-          <td><%= dateFormat.format(bill.getBillDate()) %></td>
-          <td><%= dateFormat.format(bill.getDueDate()) %></td>
-          <td>
-            <strong>Rs. <%= String.format("%,.2f", bill.getTotalAmount()) %></strong>
-          </td>
-          <td>
-            <span class="status-badge <%= bill.getStatus().equals("PENDING") ? "status-pending" : "status-paid" %>">
-              <%= bill.getStatus() %>
-            </span>
-          </td>
-          <td>
-            <div class="btn-group" role="group">
-              <a href="bill?action=view&billId=<%= bill.getBillId() %>" 
-                 class="btn btn-secondary btn-sm" title="View Bill">
-                <i class="fas fa-eye"></i>
-              </a>
-              <a href="bill?action=print&billId=<%= bill.getBillId() %>" 
-                 class="btn btn-primary btn-sm" title="Print Bill">
-                <i class="fas fa-print"></i>
-              </a>
-              <% if (bill.getStatus().equals("PENDING")) { %>
-              <form action="bill" method="post" style="display: inline;">
-                <input type="hidden" name="action" value="markPaid">
-                <input type="hidden" name="billId" value="<%= bill.getBillId() %>">
-                <button type="submit" class="btn btn-success btn-sm" title="Mark as Paid"
-                        onclick="return confirm('Are you sure you want to mark this bill as paid?')">
-                  <i class="fas fa-check"></i>
-                </button>
-              </form>
-              <% } %>
-            </div>
-          </td>
-        </tr>
-        <% } %>
+      <%
+        if (bills != null && !bills.isEmpty()) {
+          for (Bill bill : bills) {
+      %>
+      <tr>
+        <td><%= bill.getBillId() %></td>
+        <td><%= dateFormat.format(bill.getBillDate()) %></td>
+        <td><%= dateFormat.format(bill.getDueDate()) %></td>
+        <td><%= currencyFormat.format(bill.getTotalAmount()).replace("LKR", "Rs. ") %></td>
+        <td class="<%= "PENDING".equals(bill.getStatus()) ? "status-pending" : "status-paid" %>">
+          <i class="<%= "PENDING".equals(bill.getStatus()) ? "fas fa-clock" : "fas fa-check-circle" %>"></i>
+          <%= bill.getStatus() %>
+        </td>
+        <td class="action-buttons">
+          <a href="BillServlet?action=view&billId=<%= bill.getBillId() %>" class="btn btn-sm btn-info">
+            <i class="fas fa-eye"></i> View
+          </a>
+          <% if ("PENDING".equals(bill.getStatus())) { %>
+          <form action="BillServlet" method="post" style="display: inline;">
+            <input type="hidden" name="action" value="updateStatus">
+            <input type="hidden" name="billId" value="<%= bill.getBillId() %>">
+            <input type="hidden" name="status" value="PAID">
+            <button type="submit" class="btn btn-sm btn-success">
+              <i class="fas fa-check"></i> Mark Paid
+            </button>
+          </form>
+          <% } %>
+        </td>
+      </tr>
+      <%
+        }
+      } else {
+      %>
+      <tr>
+        <td colspan="6">
+          <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> No bills found for this customer.
+          </div>
+        </td>
+      </tr>
+      <%
+        }
+      %>
       </tbody>
     </table>
   </div>
-
-  <% } else { %>
-  <div class="customer-info">
-    <h4><i class="fas fa-user"></i> Customer Information</h4>
-    <p><strong>Account Number:</strong> <%= accountNumber %></p>
-  </div>
-
-  <div class="no-bills">
-    <i class="fas fa-file-invoice"></i>
-    <h4>No Bills Found</h4>
-    <p>This customer doesn't have any bills yet.</p>
-    <a href="bill?action=generate" class="btn btn-primary">
-      <i class="fas fa-plus"></i> Generate First Bill
-    </a>
-  </div>
-  <% } %>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-  $(document).ready(function() {
-    // Auto-hide alerts after 5 seconds
-    setTimeout(function() {
-      $('.alert').fadeOut('slow');
-    }, 5000);
-
-    // Confirm actions
-    $('.btn-success').click(function() {
-      return confirm('Are you sure you want to mark this bill as paid?');
-    });
-  });
-</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
 </body>
 </html>
