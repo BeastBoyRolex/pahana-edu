@@ -6,7 +6,6 @@ public class Customer {
     private String address;
     private String telephone;
     private int unitsConsumed;
-    private Object actions;
 
     // Constructors
     public Customer() {}
@@ -35,7 +34,6 @@ public class Customer {
     public int getUnitsConsumed() { return unitsConsumed; }
     public void setUnitsConsumed(int unitsConsumed) { this.unitsConsumed = unitsConsumed; }
 
-    public Object getActions() { return actions; }
-    public void setActions(Object actions) { this.actions = actions; }
+
 
 }

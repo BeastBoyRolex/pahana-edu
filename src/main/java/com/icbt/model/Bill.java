@@ -4,7 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 public class Bill {
-    private int billId;
+    private String billId;
     private String accountNumber;
     private Date billDate;
     private Date dueDate;
@@ -12,10 +12,10 @@ public class Bill {
     private String status;
     private List<BillItem> items;
 
-    // Constructors
     public Bill() {}
 
-    public Bill(String accountNumber, Date billDate, Date dueDate, double totalAmount, String status) {
+    public Bill(String billId, String accountNumber, Date billDate, Date dueDate, double totalAmount, String status) {
+        this.billId = billId;
         this.accountNumber = accountNumber;
         this.billDate = billDate;
         this.dueDate = dueDate;
@@ -23,9 +23,8 @@ public class Bill {
         this.status = status;
     }
 
-    // Getters and Setters
-    public int getBillId() { return billId; }
-    public void setBillId(int billId) { this.billId = billId; }
+    public String getBillId() { return billId; }
+    public void setBillId(String billId) { this.billId = billId; }
 
     public String getAccountNumber() { return accountNumber; }
     public void setAccountNumber(String accountNumber) { this.accountNumber = accountNumber; }

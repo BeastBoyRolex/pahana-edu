@@ -29,89 +29,139 @@ public class ItemServlet extends HttpServlet {
             action = "list";
         }
 
-        switch (action) {
-            case "new":
-                showNewForm(request, response);
-                break;
-            case "add":
-                addItem(request, response);
-                break;
-            case "edit":
-                showEditForm(request, response);
-                break;
-            case "update":
-                updateItem(request, response);
-                break;
-            case "delete":
-                deleteItem(request, response);
-                break;
-            case "view":
-                viewItem(request, response);
-                break;
-            default:
-                listItems(request, response);
+        try {
+            switch (action) {
+                case "new":
+                    showNewForm(request, response);
+                    break;
+                case "edit":
+                    showEditForm(request, response);
+                    break;
+                case "view":
+                    viewItem(request, response);
+                    break;
+                case "delete":
+                    deleteItem(request, response);
+                    break;
+                default:
+                    listItems(request, response);
+            }
+        } catch (Exception e) {
+            handleError(request, response, e);
         }
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        doGet(request, response);
+
+        String action = request.getParameter("action");
+
+        if (action == null) {
+            response.sendRedirect("items");
+            return;
+        }
+
+        try {
+            switch (action) {
+                case "add":
+                    addItem(request, response);
+                    break;
+                case "update":
+                    updateItem(request, response);
+                    break;
+                default:
+                    response.sendRedirect("items");
+            }
+        } catch (Exception e) {
+            handleError(request, response, e);
+        }
     }
 
     private void listItems(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
         List<Item> items = itemService.getAllItems();
         request.setAttribute("items", items);
-        request.getRequestDispatcher("item-list.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/item-list.jsp").forward(request, response);
     }
 
     private void showNewForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        request.getRequestDispatcher("add-item.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/item-form.jsp").forward(request, response);
     }
 
     private void showEditForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        int itemId = Integer.parseInt(request.getParameter("id"));
+        String itemId = request.getParameter("id");
         Item item = itemService.getItemById(itemId);
+
+        if (item == null) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Item not found");
+            return;
+        }
+
         request.setAttribute("item", item);
-        request.getRequestDispatcher("edit-item.jsp").forward(request, response);
+        request.setAttribute("editMode", true);
+        request.getRequestDispatcher("/WEB-INF/views/item-form.jsp").forward(request, response);
     }
 
     private void viewItem(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        int itemId = Integer.parseInt(request.getParameter("id"));
+        String itemId = request.getParameter("id");
         Item item = itemService.getItemById(itemId);
+
+        if (item == null) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Item not found");
+            return;
+        }
+
         request.setAttribute("item", item);
-        request.getRequestDispatcher("view-item.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/item-view.jsp").forward(request, response);
     }
 
     private void addItem(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        Item item = extractItemFromRequest(request);
 
-        String itemCode = request.getParameter("itemCode");
-        String title = request.getParameter("title");
-        String author = request.getParameter("author");
-        String publisher = request.getParameter("publisher");
-        String category = request.getParameter("category");
-        double price = Double.parseDouble(request.getParameter("price"));
-        int quantity = Integer.parseInt(request.getParameter("quantity"));
-        String description = request.getParameter("description");
+        if (!itemService.addItem(item)) {
+            request.setAttribute("error", "Failed to add item. Please try again.");
+            showNewForm(request, response);
+            return;
+        }
 
-        Item newItem = new Item(itemCode, title, author, publisher, category, price, quantity, description);
-        itemService.addItem(newItem);
-        response.sendRedirect("items");
+        response.sendRedirect("items?success=Item added successfully");
     }
 
     private void updateItem(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        String itemId = request.getParameter("itemId");
+        Item item = extractItemFromRequest(request);
+        item.setItemId(Integer.parseInt(itemId));
 
-        int itemId = Integer.parseInt(request.getParameter("itemId"));
+        if (!itemService.updateItem(item)) {
+            request.setAttribute("error", "Failed to update item. Please try again.");
+            request.setAttribute("item", item);
+            request.setAttribute("editMode", true);
+            request.getRequestDispatcher("/WEB-INF/views/item-form.jsp").forward(request, response);
+            return;
+        }
+
+        response.sendRedirect("items?success=Item updated successfully");
+    }
+
+    private void deleteItem(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String itemId = request.getParameter("id");
+
+        if (!itemService.deleteItem(itemId)) {
+            response.sendRedirect("items?error=Failed to delete item");
+            return;
+        }
+
+        response.sendRedirect("items?success=Item deleted successfully");
+    }
+
+    private Item extractItemFromRequest(HttpServletRequest request) {
         String itemCode = request.getParameter("itemCode");
         String title = request.getParameter("title");
         String author = request.getParameter("author");
@@ -121,17 +171,13 @@ public class ItemServlet extends HttpServlet {
         int quantity = Integer.parseInt(request.getParameter("quantity"));
         String description = request.getParameter("description");
 
-        Item item = new Item(itemCode, title, author, publisher, category, price, quantity, description);
-        item.setItemId(itemId);
-        itemService.updateItem(item);
-        response.sendRedirect("items");
+        return new Item(Integer.parseInt(itemCode), title, author, publisher, category, price, quantity);
     }
 
-    private void deleteItem(HttpServletRequest request, HttpServletResponse response)
+    private void handleError(HttpServletRequest request, HttpServletResponse response, Exception e)
             throws ServletException, IOException {
-
-        int itemId = Integer.parseInt(request.getParameter("id"));
-        itemService.deleteItem(itemId);
-        response.sendRedirect("items");
+        e.printStackTrace();
+        request.setAttribute("error", "An error occurred: " + e.getMessage());
+        listItems(request, response);
     }
 }
