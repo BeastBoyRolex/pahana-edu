@@ -13,6 +13,21 @@ public class CustomerDAO {
     private static final String UPDATE_CUSTOMER = "UPDATE customers SET name = ?, address = ?, telephone = ?, units_consumed = ? WHERE account_number = ?";
     private static final String DELETE_CUSTOMER = "DELETE FROM customers WHERE account_number = ?";
 
+    public List<Customer> getAllCustomers() {
+        List<Customer> customers = new ArrayList<>();
+        try (Connection conn = DBConnection.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(GET_ALL_CUSTOMERS)) {
+
+            while (rs.next()) {
+                customers.add(extractCustomerFromResultSet(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return customers;
+    }
+
     public Customer getCustomerByAccountNumber(String accountNumber) {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(GET_CUSTOMER_BY_ACCOUNT_NUMBER)) {
@@ -27,21 +42,6 @@ public class CustomerDAO {
             e.printStackTrace();
         }
         return null;
-    }
-
-    public List<Customer> getAllCustomers() {
-        List<Customer> customers = new ArrayList<>();
-        try (Connection conn = DBConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(GET_ALL_CUSTOMERS)) {
-
-            while (rs.next()) {
-                customers.add(extractCustomerFromResultSet(rs));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return customers;
     }
 
     public boolean addCustomer(Customer customer) {

@@ -5,10 +5,18 @@ import com.icbt.model.Item;
 import java.util.List;
 
 public class ItemService {
-    private ItemDAO itemDAO;
+    private final ItemDAO itemDAO;
 
     public ItemService() {
         this.itemDAO = new ItemDAO();
+    }
+
+    public List<Item> getAllItems() {
+        return itemDAO.getAllItems();
+    }
+
+    public Item getItemById(String itemId) {
+        return itemDAO.getItemById(itemId);
     }
 
     public boolean addItem(Item item) {
@@ -19,15 +27,11 @@ public class ItemService {
         return itemDAO.updateItem(item);
     }
 
-    public boolean deleteItem(int itemId) {
+    public boolean deleteItem(String itemId) {
         return itemDAO.deleteItem(itemId);
     }
 
-    public List<Item> getAllItems() {
-        return itemDAO.getAllItems();
-    }
-
-    public Item getItemById(int itemId) {
-        return itemDAO.getItemById(itemId);
+    public boolean updateStock(String itemId, int quantity) {
+        return itemDAO.updateStock(itemId, quantity);
     }
 }
