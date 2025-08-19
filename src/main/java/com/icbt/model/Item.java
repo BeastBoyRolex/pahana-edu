@@ -7,6 +7,8 @@ public class Item {
     private String publisher;
     private double price;
     private int quantity;
+    private String category;
+    private String description;
 
     // Constructors, getters and setters
     public Item() {}
@@ -18,6 +20,15 @@ public class Item {
         this.publisher = publisher;
         this.price = price;
         this.quantity = quantity;
+        this.category = category;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     // Getters and Setters for all properties
