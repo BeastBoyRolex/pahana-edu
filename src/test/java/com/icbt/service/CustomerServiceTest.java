@@ -6,6 +6,7 @@ import org.junit.jupiter.api.*;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -18,7 +19,13 @@ public class CustomerServiceTest {
     @BeforeEach
     void setUp() throws Exception {
         customerService = new CustomerService();
+
+        // Ensure connection is alive
         conn = DBConnection.getConnection();
+        if (conn == null || conn.isClosed()) {
+            conn = DBConnection.getConnection(); // reopen if closed
+        }
+
         accountNumber = "1";
 
         try (PreparedStatement ps = conn.prepareStatement(
@@ -34,6 +41,11 @@ public class CustomerServiceTest {
 
     @AfterEach
     void tearDown() throws Exception {
+        // Ensure connection is still valid
+        if (conn == null || conn.isClosed()) {
+            conn = DBConnection.getConnection();
+        }
+
         try (PreparedStatement ps = conn.prepareStatement("DELETE FROM customers WHERE account_number = ?")) {
             ps.setString(1, accountNumber);
             ps.executeUpdate();
@@ -41,11 +53,18 @@ public class CustomerServiceTest {
     }
 
     @Test
-    void testGetCustomerByAccountNumber() {
+    void testGetCustomerByAccountNumber() throws SQLException {
+        // Ensure connection is valid before test
+        if (conn == null || conn.isClosed()) {
+            conn = DBConnection.getConnection();
+        }
+
         Customer c = customerService.getCustomerByAccountNumber(accountNumber);
-        assertNotNull(c);
-        assertEquals("JUnit Customer", c.getName());
+
+        assertNotNull(c, "Customer should not be null");
+        assertEquals("JUnit Customer", c.getName(), "Customer name should match inserted value");
+        assertEquals("Test Address", c.getAddress());
+        assertEquals("+94 71 0000000", c.getTelephone());
+        assertEquals(0, c.getUnitsConsumed());
     }
 }
-
-
