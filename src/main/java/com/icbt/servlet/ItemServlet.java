@@ -82,12 +82,12 @@ public class ItemServlet extends HttpServlet {
             throws ServletException, IOException {
         List<Item> items = itemService.getAllItems();
         request.setAttribute("items", items);
-        request.getRequestDispatcher("/WEB-INF/views/item-list.jsp").forward(request, response);
+        request.getRequestDispatcher("item-list.jsp").forward(request, response);
     }
 
     private void showNewForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.getRequestDispatcher("/WEB-INF/views/item-form.jsp").forward(request, response);
+        request.getRequestDispatcher("add-item.jsp").forward(request, response);
     }
 
     private void showEditForm(HttpServletRequest request, HttpServletResponse response)
@@ -102,7 +102,7 @@ public class ItemServlet extends HttpServlet {
 
         request.setAttribute("item", item);
         request.setAttribute("editMode", true);
-        request.getRequestDispatcher("/WEB-INF/views/item-form.jsp").forward(request, response);
+        request.getRequestDispatcher("edit-item.jsp").forward(request, response);
     }
 
     private void viewItem(HttpServletRequest request, HttpServletResponse response)
@@ -116,7 +116,7 @@ public class ItemServlet extends HttpServlet {
         }
 
         request.setAttribute("item", item);
-        request.getRequestDispatcher("/WEB-INF/views/item-view.jsp").forward(request, response);
+        request.getRequestDispatcher("view-item.jsp").forward(request, response);
     }
 
     private void addItem(HttpServletRequest request, HttpServletResponse response)
@@ -142,7 +142,7 @@ public class ItemServlet extends HttpServlet {
             request.setAttribute("error", "Failed to update item. Please try again.");
             request.setAttribute("item", item);
             request.setAttribute("editMode", true);
-            request.getRequestDispatcher("/WEB-INF/views/item-form.jsp").forward(request, response);
+            request.getRequestDispatcher("edit-item.jsp").forward(request, response);
             return;
         }
 
