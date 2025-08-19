@@ -19,6 +19,10 @@ public class ItemService {
         return itemDAO.getItemById(itemId);
     }
 
+    public Item getItemByTitle(String title) {
+        return itemDAO.getItemByTitle(title);
+    }
+
     public boolean addItem(Item item) {
         return itemDAO.addItem(item);
     }

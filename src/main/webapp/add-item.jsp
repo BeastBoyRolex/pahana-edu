@@ -247,11 +247,6 @@
 
     <form action="items?action=add" method="post">
         <div class="form-group">
-            <label for="itemCode">Book Code:</label>
-            <input type="text" id="itemCode" name="itemCode" required class="form-control" placeholder="Enter unique book code">
-        </div>
-
-        <div class="form-group">
             <label for="title">Title:</label>
             <input type="text" id="title" name="title" required class="form-control" placeholder="Enter book title">
         </div>
@@ -272,7 +267,7 @@
         </div>
 
         <div class="form-group">
-            <label for="price">Price ($):</label>
+            <label for="price">Price (Rs.):</label>
             <input type="number" step="0.01" id="price" name="price" required class="form-control" placeholder="Enter price">
         </div>
 

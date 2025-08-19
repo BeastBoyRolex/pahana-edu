@@ -228,11 +228,6 @@
         <input type="hidden" name="itemId" value="${item.itemId}">
 
         <div class="form-group">
-            <label for="itemCode">Book Code:</label>
-            <input type="text" id="itemCode" name="itemCode" value="${item.itemCode}" required class="form-control" placeholder="Enter unique book code">
-        </div>
-
-        <div class="form-group">
             <label for="title">Title:</label>
             <input type="text" id="title" name="title" value="${item.title}" required class="form-control" placeholder="Enter book title">
         </div>
@@ -253,7 +248,7 @@
         </div>
 
         <div class="form-group">
-            <label for="price">Price ($):</label>
+            <label for="price">Price (Rs.):</label>
             <input type="number" step="0.01" id="price" name="price" value="${item.price}" required class="form-control" placeholder="Enter price">
         </div>
 
@@ -262,10 +257,10 @@
             <input type="number" id="quantity" name="quantity" value="${item.quantity}" required class="form-control" placeholder="Enter quantity">
         </div>
 
-        <div class="form-group">
-            <label for="description">Description:</label>
-            <textarea id="description" name="description" class="form-control" placeholder="Enter book description">${item.description}</textarea>
-        </div>
+<%--        <div class="form-group">--%>
+<%--            <label for="description">Description:</label>--%>
+<%--            <textarea id="description" name="description" class="form-control" placeholder="Enter book description">${item.description}</textarea>--%>
+<%--        </div>--%>
 
         <div class="btn-group">
             <button type="submit" class="btn btn-primary">

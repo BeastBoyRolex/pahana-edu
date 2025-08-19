@@ -299,7 +299,7 @@
       
       for (Bill bill : bills) {
         totalAmount += bill.getTotalAmount();
-        if (bill.getStatus().equals("PENDING")) {
+        if ("PENDING".equalsIgnoreCase(bill.getStatus())) {
           pendingBills++;
         } else {
           paidBills++;
@@ -356,7 +356,7 @@
             <strong>Rs. <%= String.format("%,.2f", bill.getTotalAmount()) %></strong>
           </td>
           <td>
-            <span class="status-badge <%= bill.getStatus().equals("PENDING") ? "status-pending" : "status-paid" %>">
+            <span class="status-badge <%= "PENDING".equalsIgnoreCase(bill.getStatus()) ? "status-pending" : "status-paid" %>">
               <%= bill.getStatus() %>
             </span>
           </td>
@@ -370,7 +370,7 @@
                  class="btn btn-primary btn-sm" title="Print Bill">
                 <i class="fas fa-print"></i>
               </a>
-              <% if (bill.getStatus().equals("PENDING")) { %>
+              <% if ("PENDING".equalsIgnoreCase(bill.getStatus())) { %>
               <form action="bill" method="post" style="display: inline;">
                 <input type="hidden" name="action" value="markPaid">
                 <input type="hidden" name="billId" value="<%= bill.getBillId() %>">
