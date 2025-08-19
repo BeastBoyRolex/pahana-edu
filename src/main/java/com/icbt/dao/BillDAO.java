@@ -115,7 +115,7 @@ public class BillDAO {
 
             while (rs.next()) {
                 Bill bill = extractBillFromResultSet(rs);
-                bill.setItems(getBillItems(bill.getBillId()));
+                bill.setItems(getBillItems("1"));
                 bills.add(bill);
             }
         } catch (SQLException e) {

@@ -60,7 +60,7 @@ public class BillService {
 
             // Generate bill ID if not set
             if (bill.getBillId() == null || bill.getBillId().isEmpty()) {
-                bill.setBillId("BILL-" + System.currentTimeMillis());
+                bill.setBillId(String.valueOf(System.currentTimeMillis()));
             }
 
             // Set default status if not set
@@ -70,7 +70,7 @@ public class BillService {
 
             // Update stock and generate bill
             for (BillItem item : items) {
-                itemService.updateStock(item.getItemId(), -item.getQuantity());
+                itemService.updateStock(item.getItemId(), item.getQuantity());
             }
 
             return billDAO.generateBill(bill, items);
