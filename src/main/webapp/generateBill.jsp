@@ -324,7 +324,7 @@
         if (items != null) {
           for (Item it : items) {
       %>
-      <option value="<%= it.getItemId() %>"><%= it.getTitle() %></option>
+      <option value="<%= it.getTitle() %>"><%= it.getTitle() %></option>
       <%
           }
         }
@@ -337,13 +337,13 @@
       <!-- Initial row -->
       <div class="item-row row">
         <div class="col-md-5">
-          <select class="form-control" name="itemId[]" required>
+          <select class="form-control" name="itemTitle[]" required>
             <option value="">-- Select Item --</option>
             <%
               if (items != null) {
                 for (Item it : items) {
             %>
-            <option value="<%= it.getItemId() %>"><%= it.getTitle() %></option>
+            <option value="<%= it.getTitle() %>"><%= it.getTitle() %></option>
             <%
                 }
               }
@@ -383,11 +383,11 @@
   $(document).ready(function() {
     // Add item row
     $('#add-item').click(function() {
-      const options = $('#itemOptions').html(); // reuse the hidden options
+      const options = $('#itemOptions').html();
       const newRow = `
             <div class="item-row row">
                 <div class="col-md-5">
-                    <select class="form-control" name="itemId[]" required>
+                    <select class="form-control" name="itemTitle[]" required>
                         ${options}
                     </select>
                 </div>

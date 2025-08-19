@@ -235,7 +235,7 @@
         <p><strong>Bill ID:</strong> #<%= bill.getBillId() %></p>
         <p><strong>Due Date:</strong> <%= dateFormat.format(bill.getDueDate()) %></p>
         <p><strong>Status:</strong>
-          <span class="status-badge <%= bill.getStatus().equals("PENDING") ? "status-pending" : "status-paid" %>">
+          <span class="status-badge <%= "PENDING".equalsIgnoreCase(bill.getStatus()) ? "status-pending" : "status-paid" %>">
             <%= bill.getStatus() %>
           </span>
         </p>

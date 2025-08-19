@@ -12,6 +12,7 @@ public class ItemDAO {
     private static final String DELETE_ITEM = "DELETE FROM items WHERE item_id=?";
     private static final String GET_ALL_ITEMS = "SELECT * FROM items";
     private static final String GET_ITEM_BY_ID = "SELECT * FROM items WHERE item_id=?";
+    private static final String GET_ITEM_BY_TITLE = "SELECT * FROM items WHERE title=?";
     private static final String UPDATE_STOCK = "UPDATE items SET quantity=? WHERE item_id=?";
 
     public List<Item> getAllItems() {
@@ -34,6 +35,22 @@ public class ItemDAO {
              PreparedStatement stmt = conn.prepareStatement(GET_ITEM_BY_ID)) {
 
             stmt.setString(1, itemId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return extractItemFromResultSet(rs);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public Item getItemByTitle(String title) {
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(GET_ITEM_BY_TITLE)) {
+
+            stmt.setString(1, title);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     return extractItemFromResultSet(rs);

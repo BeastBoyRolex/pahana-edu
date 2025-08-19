@@ -36,8 +36,6 @@
             padding-bottom: 10px;
         }
 
-
-
         .btn {
             display: inline-block;
             padding: 10px 15px;
@@ -49,7 +47,6 @@
             border: none;
         }
 
-
         .btn-edit {
             background-color: #f39c12;
             color: white;
@@ -58,7 +55,6 @@
         .btn-edit:hover {
             background-color: #e67e22;
         }
-
 
         .btn-back {
             background-color: #95a5a6;
@@ -99,7 +95,6 @@
                 width: 95%;
             }
 
-
             .detail-label {
                 display: block;
                 width: auto;
@@ -112,11 +107,6 @@
     <h1>Book Details</h1>
 
     <div class="book-details">
-        <div class="detail-row">
-            <span class="detail-label">Book Code:</span>
-            <span class="detail-value">${item.itemCode}</span>
-        </div>
-
         <div class="detail-row">
             <span class="detail-label">Title:</span>
             <span class="detail-value">${item.title}</span>
@@ -147,10 +137,10 @@
             <span class="detail-value">${item.quantity}</span>
         </div>
 
-        <div class="detail-row">
-            <span class="detail-label">Description:</span>
-            <span class="detail-value">${item.description}</span>
-        </div>
+<%--        <div class="detail-row">--%>
+<%--            <span class="detail-label">Description:</span>--%>
+<%--            <span class="detail-value">${item.description}</span>--%>
+<%--        </div>--%>
     </div>
 
     <div class="action-buttons">

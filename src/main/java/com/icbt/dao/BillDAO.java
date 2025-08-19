@@ -18,7 +18,9 @@ public class BillDAO {
 
     public boolean generateBill(Bill bill, List<BillItem> items) {
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(INSERT_BILL)) {
+             PreparedStatement stmt = conn.prepareStatement(INSERT_BILL, Statement.RETURN_GENERATED_KEYS)) {
+
+            conn.setAutoCommit(false);
 
             stmt.setString(1, bill.getAccountNumber());
             stmt.setDate(2, new java.sql.Date(bill.getBillDate().getTime()));
@@ -26,22 +28,59 @@ public class BillDAO {
             stmt.setDouble(4, bill.getTotalAmount());
             stmt.setString(5, bill.getStatus());
 
-            if (stmt.executeUpdate() > 0) {
-                if (items != null && !items.isEmpty()) {
-                    insertBillItems(bill.getBillId(), items);
-                }
-                return true;
+            int affected = stmt.executeUpdate();
+            if (affected == 0) {
+                conn.rollback();
+                return false;
             }
+
+            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    String generatedBillId = String.valueOf(generatedKeys.getLong(1));
+                    bill.setBillId(generatedBillId);
+                }
+            }
+
+            // Fallback: try to resolve bill id from inserted row if not provided by DB
+            if (bill.getBillId() == null || bill.getBillId().isEmpty()) {
+                String resolvedId = resolveInsertedBillId(conn, bill);
+                if (resolvedId == null) {
+                    conn.rollback();
+                    return false;
+                }
+                bill.setBillId(resolvedId);
+            }
+
+            if (items != null && !items.isEmpty()) {
+                insertBillItems(conn, bill.getBillId(), items);
+            }
+
+            conn.commit();
+            return true;
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
-        return false;
     }
 
-    private void insertBillItems(String billId, List<BillItem> items) throws SQLException {
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(INSERT_BILL_ITEMS)) {
+    private String resolveInsertedBillId(Connection conn, Bill bill) throws SQLException {
+        String sql = "SELECT bill_id FROM Bill WHERE account_number = ? AND bill_date = ? AND due_date = ? AND total_amount = ? ORDER BY bill_id DESC";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, bill.getAccountNumber());
+            ps.setDate(2, new java.sql.Date(bill.getBillDate().getTime()));
+            ps.setDate(3, new java.sql.Date(bill.getDueDate().getTime()));
+            ps.setDouble(4, bill.getTotalAmount());
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString(1);
+                }
+            }
+        }
+        return null;
+    }
 
+    private void insertBillItems(Connection conn, String billId, List<BillItem> items) throws SQLException {
+        try (PreparedStatement stmt = conn.prepareStatement(INSERT_BILL_ITEMS)) {
             for (BillItem item : items) {
                 stmt.setString(1, billId);
                 stmt.setString(2, item.getItemId());
@@ -115,7 +154,7 @@ public class BillDAO {
 
             while (rs.next()) {
                 Bill bill = extractBillFromResultSet(rs);
-                bill.setItems(getBillItems("1"));
+                bill.setItems(getBillItems(bill.getBillId()));
                 bills.add(bill);
             }
         } catch (SQLException e) {

@@ -58,19 +58,16 @@ public class BillService {
             
             bill.setTotalAmount(totalAmount);
 
-            // Generate bill ID if not set
-            if (bill.getBillId() == null || bill.getBillId().isEmpty()) {
-                bill.setBillId(String.valueOf(System.currentTimeMillis()));
-            }
+            // Don't force-generate a client-side billId; let DB generate if configured
 
             // Set default status if not set
             if (bill.getStatus() == null || bill.getStatus().isEmpty()) {
-                bill.setStatus("Pending");
+                bill.setStatus("PENDING");
             }
 
             // Update stock and generate bill
             for (BillItem item : items) {
-                itemService.updateStock(item.getItemId(), item.getQuantity());
+                itemService.updateStock(item.getItemId(), -item.getQuantity());
             }
 
             return billDAO.generateBill(bill, items);
