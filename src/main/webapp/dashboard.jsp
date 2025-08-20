@@ -14,6 +14,7 @@
             --success-color: #4cc9f0;
             --danger-color: #f72585;
             --warning-color: #f8961e;
+            --info-color: #560bad;
             --text-color: #2b2d42;
             --light-color: #f8f9fa;
             --border-radius: 12px;
@@ -125,10 +126,22 @@
             box-shadow: 0 4px 8px rgba(67, 97, 238, 0.2);
         }
 
+
+        .dashboard-button.guide {
+            background: linear-gradient(135deg, var(--info-color), #7209b7);
+            box-shadow: 0 4px 8px rgba(86, 11, 173, 0.2);
+        }
+
         .dashboard-button:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 15px rgba(67, 97, 238, 0.3);
         }
+
+
+        .dashboard-button.guide:hover {
+            box-shadow: 0 8px 15px rgba(86, 11, 173, 0.3);
+        }
+
 
         .dashboard-button i {
             font-size: 32px;
@@ -250,6 +263,14 @@
             List Bills
             <span>View all transactions</span>
         </a>
+
+        <!-- New Guide Me Button -->
+        <a href="guideMe.jsp" class="dashboard-button">
+            <i class="fas fa-question-circle"></i>
+            Guide Me
+            <span>System usage instructions</span>
+        </a>
+
     </div>
 
     <div class="logout-container">
