@@ -203,23 +203,28 @@ public class BillServlet extends HttpServlet {
             bill.setBillDate(billDate);
             bill.setDueDate(dueDate);
 
-            // Get bill items
-            String[] itemIds = request.getParameterValues("itemId[]");
+            // Get bill items (titles submitted from the form)
+            String[] itemTitles = request.getParameterValues("itemTitle[]");
             String[] quantities = request.getParameterValues("quantity[]");
             String[] unitPrices = request.getParameterValues("unitPrice[]");
 
-            if (itemIds == null || itemIds.length == 0) {
+            if (itemTitles == null || itemTitles.length == 0) {
                 throw new IllegalArgumentException("At least one item is required");
             }
 
             List<BillItem> items = new ArrayList<>();
-            for (int i = 0; i < itemIds.length; i++) {
-                if (itemIds[i] == null || itemIds[i].trim().isEmpty()) {
+            for (int i = 0; i < itemTitles.length; i++) {
+                if (itemTitles[i] == null || itemTitles[i].trim().isEmpty()) {
                     continue; // Skip empty rows
                 }
                 
                 BillItem item = new BillItem();
-                item.setItemId(itemIds[i]);
+                // Resolve title -> itemId
+                Item matched = itemService.getItemByTitle(itemTitles[i]);
+                if (matched == null) {
+                    throw new IllegalArgumentException("Item not found: " + itemTitles[i]);
+                }
+                item.setItemId(String.valueOf(matched.getItemId()));
                 item.setQuantity(Integer.parseInt(quantities[i]));
                 item.setUnitPrice(Double.parseDouble(unitPrices[i]));
                 items.add(item);

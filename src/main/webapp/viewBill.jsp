@@ -272,7 +272,7 @@
         <p><strong>Bill Date:</strong> <%= dateFormat.format(bill.getBillDate()) %></p>
         <p><strong>Due Date:</strong> <%= dateFormat.format(bill.getDueDate()) %></p>
         <p><strong>Status:</strong>
-          <span class="status-badge <%= bill.getStatus().equals("PENDING") ? "status-pending" : "status-paid" %>">
+          <span class="status-badge <%= "PENDING".equalsIgnoreCase(bill.getStatus()) ? "status-pending" : "status-paid" %>">
             <%= bill.getStatus() %>
           </span>
         </p>
@@ -318,7 +318,7 @@
     <div class="d-flex justify-content-between flex-wrap">
       <div>
         <%
-          if (bill.getStatus().equals("PENDING")) {
+          if ("PENDING".equalsIgnoreCase(bill.getStatus())) {
         %>
         <form action="bill" method="post" style="display: inline;">
           <input type="hidden" name="action" value="markPaid">

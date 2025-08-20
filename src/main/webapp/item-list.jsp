@@ -282,7 +282,6 @@
             <thead>
             <tr>
                 <th>ID</th>
-                <th>Code</th>
                 <th>Title</th>
                 <th>Author</th>
                 <th>Price</th>
@@ -298,7 +297,6 @@
             %>
             <tr>
                 <td><%= item.getItemId() %></td>
-                <td><%= item.getItemCode() %></td>
                 <td><strong><%= item.getTitle() %></strong></td>
                 <td><%= item.getAuthor() %></td>
                 <td>$<%= String.format("%.2f", item.getPrice()) %></td>

@@ -82,12 +82,12 @@ public class ItemServlet extends HttpServlet {
             throws ServletException, IOException {
         List<Item> items = itemService.getAllItems();
         request.setAttribute("items", items);
-        request.getRequestDispatcher("/WEB-INF/views/item-list.jsp").forward(request, response);
+        request.getRequestDispatcher("item-list.jsp").forward(request, response);
     }
 
     private void showNewForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.getRequestDispatcher("/WEB-INF/views/item-form.jsp").forward(request, response);
+        request.getRequestDispatcher("add-item.jsp").forward(request, response);
     }
 
     private void showEditForm(HttpServletRequest request, HttpServletResponse response)
@@ -102,7 +102,7 @@ public class ItemServlet extends HttpServlet {
 
         request.setAttribute("item", item);
         request.setAttribute("editMode", true);
-        request.getRequestDispatcher("/WEB-INF/views/item-form.jsp").forward(request, response);
+        request.getRequestDispatcher("edit-item.jsp").forward(request, response);
     }
 
     private void viewItem(HttpServletRequest request, HttpServletResponse response)
@@ -116,12 +116,12 @@ public class ItemServlet extends HttpServlet {
         }
 
         request.setAttribute("item", item);
-        request.getRequestDispatcher("/WEB-INF/views/item-view.jsp").forward(request, response);
+        request.getRequestDispatcher("view-item.jsp").forward(request, response);
     }
 
     private void addItem(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        Item item = extractItemFromRequest(request);
+        Item item = extractItemFromRequestForCreate(request);
 
         if (!itemService.addItem(item)) {
             request.setAttribute("error", "Failed to add item. Please try again.");
@@ -135,14 +135,14 @@ public class ItemServlet extends HttpServlet {
     private void updateItem(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String itemId = request.getParameter("itemId");
-        Item item = extractItemFromRequest(request);
+        Item item = extractItemFromRequestForUpdate(request);
         item.setItemId(Integer.parseInt(itemId));
 
         if (!itemService.updateItem(item)) {
             request.setAttribute("error", "Failed to update item. Please try again.");
             request.setAttribute("item", item);
             request.setAttribute("editMode", true);
-            request.getRequestDispatcher("/WEB-INF/views/item-form.jsp").forward(request, response);
+            request.getRequestDispatcher("edit-item.jsp").forward(request, response);
             return;
         }
 
@@ -161,8 +161,7 @@ public class ItemServlet extends HttpServlet {
         response.sendRedirect("items?success=Item deleted successfully");
     }
 
-    private Item extractItemFromRequest(HttpServletRequest request) {
-        String itemCode = request.getParameter("itemCode");
+    private Item extractItemFromRequestForCreate(HttpServletRequest request) {
         String title = request.getParameter("title");
         String author = request.getParameter("author");
         String publisher = request.getParameter("publisher");
@@ -171,7 +170,21 @@ public class ItemServlet extends HttpServlet {
         int quantity = Integer.parseInt(request.getParameter("quantity"));
         String description = request.getParameter("description");
 
-        return new Item(Integer.parseInt(itemCode), title, author, publisher, category, price, quantity);
+        // Auto-generate a simple integer ID (mapped to VARCHAR in DB by DAO)
+        int generatedId = (int) (System.currentTimeMillis() / 1000);
+        return new Item(generatedId, title, author, publisher, category, price, quantity);
+    }
+
+    private Item extractItemFromRequestForUpdate(HttpServletRequest request) {
+        String title = request.getParameter("title");
+        String author = request.getParameter("author");
+        String publisher = request.getParameter("publisher");
+        String category = request.getParameter("category");
+        double price = Double.parseDouble(request.getParameter("price"));
+        int quantity = Integer.parseInt(request.getParameter("quantity"));
+        String description = request.getParameter("description");
+
+        return new Item(0, title, author, publisher, category, price, quantity);
     }
 
     private void handleError(HttpServletRequest request, HttpServletResponse response, Exception e)
