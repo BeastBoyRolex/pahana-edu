@@ -3,6 +3,6 @@
 <head><title>Hello</title></head>
 <body>
 <h1>Hello from JSP!</h1>
-<a href="login.jsp">Go to Servlet</a>
+<a href="loginpage.jsp">Go to Servlet</a>
 </body>
 </html>
